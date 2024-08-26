@@ -1,0 +1,11 @@
+Ali,ali6,6666,superadmin
+Lebron James,james,james6,administrator
+Dwayne Wade,dwade,dwade3,administrator
+Kyrie Irving,kyrie,kyrie11,scheduler
+Central Cee,cench,cenchcee,customer
+Karl Anthony,karlA,ant,manager
+Tom Aspinall,tom,ass,scheduler
+Post Malone,posty,malone,manager
+Jeff Bezos,bezos,jeff,manager
+Steph Curry,curry,30,manager
+Tom Aspinall,freddy,fred,scheduler
