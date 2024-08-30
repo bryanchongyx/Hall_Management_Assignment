@@ -10,6 +10,7 @@ public class DataIO {
     public static ArrayList<Admin> allAdmin = new ArrayList<>();
     public static ArrayList<Scheduler> allScheduler = new ArrayList<>();
     public static ArrayList<Manager> allManager = new ArrayList<>();
+    public static ArrayList<Hall> allHalls = new ArrayList<>();
 
     public static void read() {
         try {
@@ -98,6 +99,27 @@ public class DataIO {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error reading files.");
         }
+
+        //Reading Manager data
+        try {
+            Scanner scanner = new Scanner(new File("halls.txt"));
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] hallData = line.split(",");
+                if (hallData.length == 4) {
+                    String hallName = hallData[0].trim();
+                    String hallType = hallData[1].trim();
+                    int capacity = Integer.parseInt(hallData[2].trim());
+                    double ratePerHour = Double.parseDouble(hallData[3].trim());
+                    Hall hall = new Hall(hallName, hallType, capacity, ratePerHour);
+                    allHalls.add(hall);
+                }
+            }
+            scanner.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading hall data.");
+        }        
+
     }
 
     // Check if a username already exists in allUser
@@ -287,8 +309,25 @@ public class DataIO {
                 a.println(manager.getFullname() + "," + manager.getUserid() + "," + manager.getPassword() + "," + manager.getJoinedDate());
             }
             a.close();
+
+            //Writing to halls.txt
+            a = new PrintWriter("halls.txt");
+            for (Hall hall : allHalls) {
+                a.println(hall.getHallName() + "," + hall.getHallType() + "," + hall.getCapacity() + "," + hall.getRatePerHour());
+            }
+            a.close();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error writing to files.");
         }
     }
+
+    public static Hall findHallByName(String hallName) {
+        for (Hall hall : allHalls) {
+            if (hall.getHallName().equalsIgnoreCase(hallName)) {
+                return hall;
+            }
+        }
+        return null;
+    }
+
 }

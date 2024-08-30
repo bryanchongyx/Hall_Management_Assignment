@@ -1,37 +1,108 @@
-
 public class Hall {
-    private String name;
-    private String location;
-    private double price;
+    private String hallName;
+    private String hallType;
+    private int capacity;
+    private double ratePerHour;
+    private String availabilityStart;
+    private String availabilityEnd;
+    private String maintenanceStart;
+    private String maintenanceEnd;
+    private String remarks;
 
-    public Hall(String name, String location, double price) {
-        this.name = name;
-        this.location = location;
-        this.price = price;
+    public Hall(String hallName, String hallType, int capacity, double ratePerHour) {
+        this.hallName = hallName;
+        this.hallType = hallType;
+        this.capacity = capacity;
+        this.ratePerHour = ratePerHour;
+        this.availabilityStart = "";
+        this.availabilityEnd = "";
+        this.maintenanceStart = "";
+        this.maintenanceEnd = "";
+        this.remarks = "";
     }
 
-    // Getters and setters
-    public String getName() {
-        return name;
+    // Getters and setters for all fields
+    public String getHallName() {
+        return hallName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setHallName(String hallName) {
+        this.hallName = hallName;
     }
 
-    public String getLocation() {
-        return location;
+    public String getHallType() {
+        return hallType;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setHallType(String hallType) {
+        this.hallType = hallType;
     }
 
-    public double getPrice() {
-        return price;
+    public int getCapacity() {
+        return capacity;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public double getRatePerHour() {
+        return ratePerHour;
+    }
+
+    public void setRatePerHour(double ratePerHour) {
+        this.ratePerHour = ratePerHour;
+    }
+
+    public String getAvailabilityStart() {
+        return availabilityStart;
+    }
+
+    public void setAvailabilityStart(String availabilityStart) {
+        this.availabilityStart = availabilityStart;
+    }
+
+    public String getAvailabilityEnd() {
+        return availabilityEnd;
+    }
+
+    public void setAvailabilityEnd(String availabilityEnd) {
+        this.availabilityEnd = availabilityEnd;
+    }
+
+    public String getMaintenanceStart() {
+        return maintenanceStart;
+    }
+
+    public void setMaintenanceStart(String maintenanceStart) {
+        this.maintenanceStart = maintenanceStart;
+    }
+
+    public String getMaintenanceEnd() {
+        return maintenanceEnd;
+    }
+
+    public void setMaintenanceEnd(String maintenanceEnd) {
+        this.maintenanceEnd = maintenanceEnd;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public void setAvailability(String startDate, String startTime, String endDate, String endTime, String remarks) {
+        this.availabilityStart = startDate + " " + startTime;
+        this.availabilityEnd = endDate + " " + endTime;
+        this.remarks = remarks;
+    }
+
+    public void setMaintenance(String startDate, String startTime, String endDate, String endTime, String remarks) {
+        this.maintenanceStart = startDate + " " + startTime;
+        this.maintenanceEnd = endDate + " " + endTime;
+        this.remarks = remarks;
     }
 }

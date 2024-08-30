@@ -63,9 +63,9 @@ public class PageLoginSignIn implements ActionListener {
                     }
                     Main.a2.a.setVisible(true);
                 } else if ("scheduler".equals(role)) {
-                    // Implement the scheduler page similar to others
-                    // Example: Main.a5 = new PageScheduler();
-                    // Main.a5.a.setVisible(true);
+                    if(Main.a9 == null){
+                        Main.a9 = new PageScheduler();
+                    }
                 } else {
                     throw new Exception("Unrecognized role");
                 }
