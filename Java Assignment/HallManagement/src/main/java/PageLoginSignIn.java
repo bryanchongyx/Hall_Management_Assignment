@@ -66,7 +66,14 @@ public class PageLoginSignIn implements ActionListener {
                     if(Main.a9 == null){
                         Main.a9 = new PageScheduler();
                     }
-                } else {
+                } else if ("customer".equals (role)){
+                    JOptionPane.showMessageDialog ("Not ready yet");
+
+                }
+                else if ("manager".equals (role)){
+                    JOptionPane.showMessageDialog ("Not ready yet");
+                }
+                 else {
                     throw new Exception("Unrecognized role");
                 }
 
