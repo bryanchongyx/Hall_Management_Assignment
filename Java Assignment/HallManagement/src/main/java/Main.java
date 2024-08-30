@@ -7,10 +7,12 @@ public class Main {
     public static PageSchedulerManagement a5;
     public static PageCustomerManagement a6;
     public static PageManagerManagement a7;
+    public static BookingSystem a8;
 
 
     public static void main(String[] args) {
         DataIO.read();
         a1 = new PageLoginSignIn();
+        a8 = new BookingSystem(defaultUser)
     }
 }
