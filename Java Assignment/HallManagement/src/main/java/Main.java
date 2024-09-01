@@ -1,4 +1,3 @@
-
 public class Main {
     public static PageLoginSignIn a1;
     public static PageAdmin a2;
@@ -10,10 +9,17 @@ public class Main {
     public static BookingSystem a8;
     public static PageScheduler a9;
 
+    public static User defaultUser; // Keep track of the logged-in user
 
     public static void main(String[] args) {
-        DataIO.read();
+        DataIO.read(); // Read all the data
+        
         a1 = new PageLoginSignIn();
+        // Assuming defaultUser gets set after successful login
+        defaultUser = DataIO.checkUserid("someUserId"); // Example of getting the user
+        
+        // Initialize BookingSystem with the logged-in user
         a8 = new BookingSystem(defaultUser);
+        a8.setVisible(true);
     }
 }
