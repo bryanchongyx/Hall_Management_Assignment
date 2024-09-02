@@ -17,9 +17,6 @@ public class Main {
         a1 = new PageLoginSignIn();
         // Assuming defaultUser gets set after successful login
         defaultUser = DataIO.checkUserid("someUserId"); // Example of getting the user
-        
-        // Initialize BookingSystem with the logged-in user
-        a8 = new BookingSystem(defaultUser);
-        a8.setVisible(true);
+
     }
 }

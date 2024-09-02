@@ -30,7 +30,7 @@ public class PageLoginSignIn implements ActionListener {
     }
     
     @Override
-    public void actionPerformed(ActionEvent e) {
+public void actionPerformed(ActionEvent e) {
         try {
             if (e.getSource() == login) {
                 String userid_input = JOptionPane.showInputDialog("Enter userid: ").trim();
@@ -49,7 +49,7 @@ public class PageLoginSignIn implements ActionListener {
                 a.setVisible(false);
 
                 // Check user role
-                String role = DataIO.checkUserRole(userid_input); 
+                String role = foundUser.getRoles(); // Updated to get role from foundUser
 
                 // Show the appropriate page based on the role
                 if ("superadmin".equals(role)) {
@@ -66,14 +66,15 @@ public class PageLoginSignIn implements ActionListener {
                     if(Main.a9 == null){
                         Main.a9 = new PageScheduler();
                     }
-                } else if ("customer".equals (role)){
-                    JOptionPane.showMessageDialog ("Not ready yet");
-
-                }
-                else if ("manager".equals (role)){
-                    JOptionPane.showMessageDialog ("Not ready yet");
-                }
-                 else {
+                } else if ("customer".equals(role)) {
+                    // Only instantiate and show BookingSystem if the user is a customer
+                    if (Main.a8 == null) {
+                        Main.a8 = new BookingSystem(foundUser); // Instantiate BookingSystem with the logged-in user
+                    }
+                    Main.a8.setVisible(true);
+                } else if ("manager".equals(role)) {
+                    JOptionPane.showMessageDialog(a, "Not ready yet");
+                } else {
                     throw new Exception("Unrecognized role");
                 }
 

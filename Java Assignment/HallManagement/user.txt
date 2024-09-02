@@ -9,3 +9,5 @@ Post Malone,posty,malone,manager
 Jeff Bezos,bezos,jeff,manager
 Steph Curry,curry,30,manager
 Tom Aspinall,freddy,fred,scheduler
+Chandu Kolavennu,chandu,chandu,customer
+Chandu Kolavennu,ckolavennu,EL@w3dia19,scheduler

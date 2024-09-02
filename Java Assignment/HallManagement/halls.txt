@@ -1,0 +1,4 @@
+Aud 1,Auditorium,1000,300.0
+Aud 2,Auditorium,1000,300.0
+Aud 3,Auditorium,1000,300.0
+Ban 1,Banquet Hall,300,100.0

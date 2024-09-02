@@ -97,7 +97,7 @@ public class PageScheduler implements ActionListener {
     // Load hall data into the table
     private void loadHallData() {
         tableModel.setRowCount(0); // Clear existing data
-        for (Hall hall : DataIO.allHalls) {
+        for (Hall hall : DataIO.allHall) {
             Object[] rowData = {hall.getHallName(), hall.getHallType(), hall.getCapacity(), hall.getRatePerHour(), false};
             tableModel.addRow(rowData);
         }
@@ -137,7 +137,7 @@ public class PageScheduler implements ActionListener {
                 }
 
                 Hall newHall = new Hall(hallName, hallType, capacity, rate);
-                DataIO.allHalls.add(newHall);
+                DataIO.allHall.add(newHall);
                 DataIO.write(); // Save changes to file
 
                 loadHallData(); // Refresh table data
@@ -203,7 +203,7 @@ public class PageScheduler implements ActionListener {
                 } else {
                     // Remove selected halls from the list and update the file
                     for (Hall hall : hallsToDelete) {
-                        DataIO.allHalls.remove(hall);
+                        DataIO.allHall.remove(hall);
                     }
                     DataIO.write(); // Save changes to file
                     loadHallData(); // Refresh table data

@@ -1,123 +1,394 @@
-package redo.java.assign;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 public class DataIO {
-    public static List<User> allUsers = new ArrayList<>();
-    public static List<Customer> allCustomers = new ArrayList<>();
-    public static List<Admin> allAdmins = new ArrayList<>();
-    public static List<Scheduler> allSchedulers = new ArrayList<>();
-    public static List<Manager> allManagers = new ArrayList<>();
-    public static List<Hall> allHalls = new ArrayList<>();
-    public static List<Booking> allBookings = new ArrayList<>();
+    // Data structures for different user roles and halls
+    public static ArrayList<User> allUser = new ArrayList<>();
+    public static ArrayList<Customer> allCustomer = new ArrayList<>();
+    public static ArrayList<Admin> allAdmin = new ArrayList<>();
+    public static ArrayList<Scheduler> allScheduler = new ArrayList<>();
+    public static ArrayList<Manager> allManager = new ArrayList<>();
+    public static ArrayList<Hall> allHall = new ArrayList<>();
+    public static ArrayList<Booking> allBooking = new ArrayList<>();
 
     // File paths
-    private static final String USERS_FILE = "users.dat";
-    private static final String CUSTOMERS_FILE = "customers.dat";
-    private static final String ADMINS_FILE = "admins.dat";
-    private static final String SCHEDULERS_FILE = "schedulers.dat";
-    private static final String MANAGERS_FILE = "managers.dat";
-    private static final String HALLS_FILE = "halls.dat";
-    private static final String BOOKINGS_FILE = "bookings.dat";
+    private static final String USERS_FILE = "user.txt";
+    private static final String CUSTOMERS_FILE = "customer.txt";
+    private static final String ADMINS_FILE = "admin.txt";
+    private static final String SCHEDULERS_FILE = "scheduler.txt";
+    private static final String MANAGERS_FILE = "manager.txt";
+    private static final String HALLS_FILE = "halls.txt";
+    private static final String BOOKINGS_FILE = "bookings.txt";
+    
 
-    // Method to read all data
-    public static void readAllData() {
-        allUsers = readData(USERS_FILE);
-        allCustomers = readData(CUSTOMERS_FILE);
-        allAdmins = readData(ADMINS_FILE);
-        allSchedulers = readData(SCHEDULERS_FILE);
-        allManagers = readData(MANAGERS_FILE);
-        allHalls = readData(HALLS_FILE);
-        allBookings = readData(BOOKINGS_FILE);
+    // Method to read all data from text files
+    public static void read() {
+        readUsers();
+        readCustomers();
+        readAdmins();
+        readSchedulers();
+        readManagers();
+        readHalls();
+        // If booking data needs to be read, add readBookings() here
     }
 
-    // Method to write all data
-    public static void writeAllData() {
-        writeData(allUsers, USERS_FILE);
-        writeData(allCustomers, CUSTOMERS_FILE);
-        writeData(allAdmins, ADMINS_FILE);
-        writeData(allSchedulers, SCHEDULERS_FILE);
-        writeData(allManagers, MANAGERS_FILE);
-        writeData(allHalls, HALLS_FILE);
-        writeData(allBookings, BOOKINGS_FILE);
-    }
-
-    // Generic method to read data
-    @SuppressWarnings("unchecked")
-    private static <T> List<T> readData(String fileName) {
-        List<T> dataList = new ArrayList<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
-            dataList = (List<T>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println(fileName + " not found. Creating new file.");
-            writeData(dataList, fileName); // Create empty file if not found
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            System.out.println("Error reading " + fileName);
-        }
-        return dataList;
-    }
-
-    // Generic method to write data
-    private static <T> void writeData(List<T> dataList, String fileName) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            oos.writeObject(dataList);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error writing to " + fileName);
-        }
+    // Method to write all data back to text files
+    public static void write() {
+        writeUsers();
+        writeCustomers();
+        writeAdmins();
+        writeSchedulers();
+        writeManagers();
+        writeHalls();
+        // If booking data needs to be written, add writeBookings() here
     }
 
     // User-related methods
-    public static User checkUserId(String userId) {
-        for (User user : allUsers) {
-            if (user.getUserId().equalsIgnoreCase(userId)) {
-                return user;
+    private static void readUsers() {
+        try (Scanner scanner = new Scanner(new File(USERS_FILE))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] userData = line.split(",");
+                if (userData.length == 4) {
+                    String fullname = userData[0].trim();
+                    String userid = userData[1].trim();
+                    String password = userData[2].trim();
+                    String roles = userData[3].trim();
+                    allUser.add(new User(fullname, userid, password, roles));
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading user data.");
+        }
+    }
+
+    private static void writeUsers() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(USERS_FILE))) {
+            for (User u : allUser) {
+                writer.println(u.getFullname() + "," + u.getUserid() + "," + u.getPassword() + "," + u.getRoles());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing user data.");
+        }
+    }
+
+    // Customer-related methods
+    private static void readCustomers() {
+        try (Scanner scanner = new Scanner(new File(CUSTOMERS_FILE))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] customerData = line.split(",");
+                if (customerData.length == 5) {
+                    String userid = customerData[0].trim();
+                    String password = customerData[1].trim();
+                    String fullname = customerData[2].trim();
+                    String email = customerData[3].trim();
+                    String ph_number = customerData[4].trim();
+                    allCustomer.add(new Customer(fullname, userid, password, email, ph_number));
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading customer data.");
+        }
+    }
+
+    private static void writeCustomers() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(CUSTOMERS_FILE))) {
+            for (Customer c : allCustomer) {
+                writer.println(c.getFullname() + "," + c.getUserid() + "," + c.getPassword() + "," + c.getEmail() + "," + c.getPh_number());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing customer data.");
+        }
+    }
+    
+        public static void addBooking(Booking booking) {
+        allBooking.add(booking);
+        writeBookings(); // Write booking data to file
+    }
+    
+        public static void writeBookings() {
+        try (PrintWriter writer = new PrintWriter("bookings.txt")) {
+            for (Booking booking : allBooking) {
+                writer.println(booking.getUser().getUserid() + "," +
+                               booking.getHall().getHallName() + "," +
+                               booking.getBookingDate() + "," +
+                               booking.isPaid() + "," +
+                               booking.isCancelled());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing booking data.");
+        }
+    }
+
+    // Admin-related methods
+    private static void readAdmins() {
+        try (Scanner scanner = new Scanner(new File(ADMINS_FILE))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] adminData = line.split(",");
+                if (adminData.length == 4) {
+                    String fullname = adminData[0].trim();
+                    String userid = adminData[1].trim();
+                    String password = adminData[2].trim();
+                    String joinedDate = adminData[3].trim();
+                    allAdmin.add(new Admin(fullname, userid, password, joinedDate));
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading admin data.");
+        }
+    }
+
+    private static void writeAdmins() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(ADMINS_FILE))) {
+            for (Admin admin : allAdmin) {
+                writer.println(admin.getFullname() + "," + admin.getUserid() + "," + admin.getPassword() + "," + admin.getDate());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing admin data.");
+        }
+    }
+
+    // Scheduler-related methods
+    private static void readSchedulers() {
+        try (Scanner scanner = new Scanner(new File(SCHEDULERS_FILE))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] schedulerData = line.split(",");
+                if (schedulerData.length == 4) {
+                    String fullname = schedulerData[0].trim();
+                    String userid = schedulerData[1].trim();
+                    String password = schedulerData[2].trim();
+                    String joinedDate = schedulerData[3].trim();
+                    allScheduler.add(new Scheduler(fullname, userid, password, joinedDate));
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading scheduler data.");
+        }
+    }
+
+    private static void writeSchedulers() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(SCHEDULERS_FILE))) {
+            for (Scheduler scheduler : allScheduler) {
+                writer.println(scheduler.getFullname() + "," + scheduler.getUserid() + "," + scheduler.getPassword() + "," + scheduler.getJoinedDate());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing scheduler data.");
+        }
+    }
+
+    // Manager-related methods
+    private static void readManagers() {
+        try (Scanner scanner = new Scanner(new File(MANAGERS_FILE))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] managerData = line.split(",");
+                if (managerData.length == 4) {
+                    String fullname = managerData[0].trim();
+                    String userid = managerData[1].trim();
+                    String password = managerData[2].trim();
+                    String joinedDate = managerData[3].trim();
+                    allManager.add(new Manager(fullname, userid, password, joinedDate));
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading manager data.");
+        }
+    }
+
+    private static void writeManagers() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(MANAGERS_FILE))) {
+            for (Manager manager : allManager) {
+                writer.println(manager.getFullname() + "," + manager.getUserid() + "," + manager.getPassword() + "," + manager.getJoinedDate());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing manager data.");
+        }
+    }
+
+    // Hall-related methods
+    private static void readHalls() {
+        try (Scanner scanner = new Scanner(new File(HALLS_FILE))) {
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] hallData = line.split(",");
+                if (hallData.length == 4) {
+                    String hallName = hallData[0].trim();
+                    String hallType = hallData[1].trim();
+                    int capacity = Integer.parseInt(hallData[2].trim());
+                    double ratePerHour = Double.parseDouble(hallData[3].trim());
+                    Hall hall = new Hall(hallName, hallType, capacity, ratePerHour);
+                    allHall.add(hall);
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading hall data.");
+        }
+    }
+
+    private static void writeHalls() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(HALLS_FILE))) {
+            for (Hall hall : allHall) {
+                writer.println(hall.getHallName() + "," + hall.getHallType() + "," + hall.getCapacity() + "," + hall.getRatePerHour());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing hall data.");
+        }
+    }
+
+    // User lookup methods
+    public static User checkUserid(String s) {
+        for (User u : allUser) {
+            if (s.equals(u.getUserid())) {
+                return u;
             }
         }
         return null;
     }
 
-    public static void addUser(User user) {
-        allUsers.add(user);
-        writeData(allUsers, USERS_FILE);
-    }
-
-    // Booking-related methods
-    public static List<Booking> getBookingsByUser(User user) {
-        List<Booking> userBookings = new ArrayList<>();
-        for (Booking booking : allBookings) {
-            if (booking.getUser().equals(user)) {
-                userBookings.add(booking);
+    // Method to check the role of a user by ID
+    public static String checkUserRole(String userid) {
+        for (User u : allUser) {
+            if (userid.equals(u.getUserid())) {
+                return u.getRoles();
             }
         }
-        return userBookings;
+        return null;
     }
 
-    public static void addBooking(Booking booking) {
-        allBookings.add(booking);
-        writeData(allBookings, BOOKINGS_FILE);
+    // Customer lookup methods
+    public static Customer checkCustomerUserid(String s) {
+        for (Customer c : allCustomer) {
+            if (s.equals(c.getUserid())) {
+                return c;
+            }
+        }
+        return null;
     }
 
-    public static void removeBooking(Booking booking) {
-        allBookings.remove(booking);
-        writeData(allBookings, BOOKINGS_FILE);
+    public static Customer checkCustomerEmail(String s) {
+        for (Customer c : allCustomer) {
+            if (s.equals(c.getEmail())) {
+                return c;
+            }
+        }
+        return null;
     }
 
-    // Hall-related methods
+    public static Customer checkCustomerPhone(String phone) {
+        for (Customer c : allCustomer) {
+            if (c.getPh_number().equals(phone)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    // Admin lookup methods
+    public static Admin checkAdminUserid(String s) {
+        for (Admin admin : allAdmin) {
+            if (s.equals(admin.getUserid())) {
+                return admin;
+            }
+        }
+        return null;
+    }
+
+    public static Admin findAdminByUserId(String userid) {
+        for (Admin admin : allAdmin) {
+            if (admin.getUserid().equals(userid)) {
+                return admin;
+            }
+        }
+        return null;
+    }
+
+    // Scheduler lookup methods
+    public static Scheduler checkSchedulerUserid(String username) {
+        for (Scheduler scheduler : allScheduler) {
+            if (username.equals(scheduler.getUserid())) {
+                return scheduler;
+            }
+        }
+        return null;
+    }
+
+    public static Scheduler findSchedulerByUserid(String userid) {
+        for (Scheduler scheduler : allScheduler) {
+            if (scheduler.getUserid().equals(userid)) {
+                return scheduler;
+            }
+        }
+        return null;
+    }
+
+    // Manager lookup methods
+    public static Manager findManagerByUserid(String userid) {
+        for (Manager manager : allManager) {
+            if (manager.getUserid().equals(userid)) {
+                return manager;
+            }
+        }
+        return null;
+    }
+
+    // Method to remove a user by user ID
+    public static void removeUserByUserId(String userid) {
+        allUser.removeIf(user -> user.getUserid().equals(userid));
+    }
+
+    // Method to remove a scheduler by username
+    public static void removeSchedulerByUsername(String userid) {
+        Scheduler schedulerToRemove = checkSchedulerUserid(userid);
+        if (schedulerToRemove != null) {
+            allScheduler.remove(schedulerToRemove);
+        }
+    }
+
+    // Method to update a user's user ID
+    public static void updateUserUserid(String oldUsername, String newUsername) {
+        for (User user : allUser) {
+            if (user.getUserid().equals(oldUsername)) {
+                user.setUserid(newUsername);
+                break;
+            }
+        }
+    }
+
+    // Method to update a scheduler's user ID
+    public static void updateSchedulerUserid(String oldUsername, String newUsername) {
+        for (Scheduler scheduler : allScheduler) {
+            if (scheduler.getUserid().equals(oldUsername)) {
+                scheduler.setUserid(newUsername);
+                break;
+            }
+        }
+        updateUserUserid(oldUsername, newUsername); // Update in users list
+    }
+
+    // Method to update a manager's user ID
+    public static void updateManagerUserid(String oldUsername, String newUsername) {
+        for (Manager manager : allManager) {
+            if (manager.getUserid().equals(oldUsername)) {
+                manager.setUserid(newUsername);
+                break;
+            }
+        }
+        updateUserUserid(oldUsername, newUsername); // Update in users list
+    }
+
+    // Method to find a hall by name
     public static Hall findHallByName(String hallName) {
-        for (Hall hall : allHalls) {
+        for (Hall hall : allHall) {
             if (hall.getHallName().equalsIgnoreCase(hallName)) {
                 return hall;
             }
         }
         return null;
-    }
-
-    public static void addHall(Hall hall) {
-        allHalls.add(hall);
-        writeData(allHalls, HALLS_FILE);
     }
 }

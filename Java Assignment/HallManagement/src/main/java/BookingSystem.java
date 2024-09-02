@@ -1,7 +1,10 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BookingSystem extends JFrame {
@@ -11,8 +14,8 @@ public class BookingSystem extends JFrame {
 
     public BookingSystem(User user) {
         this.currentUser = user;
-        this.halls = new ArrayList<>();
-        this.bookings = new ArrayList<>();
+        this.halls = DataIO.allHall; // Assuming you load halls from DataIO
+        this.bookings = DataIO.allBooking; // Assuming you load bookings from DataIO
         initializeUI();
     }
 
@@ -111,17 +114,57 @@ public class BookingSystem extends JFrame {
     }
 
     private void handleBooking(String hallType) {
-        String date = JOptionPane.showInputDialog("Enter Date (YYYY-MM-DD):");
-        String time = JOptionPane.showInputDialog("Enter Time (HH:MM):");
-
-        double amount = calculateAmount(hallType);
-        Booking newBooking = new Booking(currentUser, hallType, date, time);
-        bookings.add(newBooking);
-
-        JOptionPane.showMessageDialog(null, "Booking confirmed for " + hallType + " on " + date + " at " + time + ". Payment: $" + amount);
-
-        showPaymentUI();
+    // Validate user input for hall type
+    if (hallType == null || hallType.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please select a valid hall type.");
+        return;
     }
+
+    // Find the selected hall
+    Hall selectedHall = halls.stream()
+                             .filter(hall -> hall.getHallType().equalsIgnoreCase(hallType))
+                             .findFirst()
+                             .orElse(null);
+
+    if (selectedHall == null) {
+        JOptionPane.showMessageDialog(this, "Hall type not found!");
+        return;
+    }
+
+    // Prompt user for booking date and validate input
+    String dateStr = JOptionPane.showInputDialog("Enter Date (YYYY-MM-DD):");
+    if (dateStr == null || dateStr.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Date cannot be empty.");
+        return;
+    }
+
+    // Parse and validate booking date
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    Date bookingDate;
+    try {
+        bookingDate = dateFormat.parse(dateStr);
+    } catch (ParseException ex) {
+        JOptionPane.showMessageDialog(this, "Invalid date format.");
+        return;
+    }
+
+    // Prompt user for booking time and validate input
+    String time = JOptionPane.showInputDialog("Enter Time (HH:MM):");
+    if (time == null || time.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Time cannot be empty.");
+        return;
+    }
+
+    // Create a new booking and add it to the system
+    Booking newBooking = new Booking(currentUser, selectedHall, bookingDate, time);
+    bookings.add(newBooking);
+    DataIO.addBooking(newBooking);  // Add booking to the data storage
+
+    // Confirm booking and proceed to payment
+    JOptionPane.showMessageDialog(this, "Booking confirmed for " + hallType + " on " + dateStr + " at " + time + ". Payment: $" + calculateAmount(hallType));
+    showPaymentUI();
+}
+
 
     private void showPaymentUI() {
         JOptionPane.showMessageDialog(this, "Payment UI Placeholder");
@@ -131,29 +174,46 @@ public class BookingSystem extends JFrame {
     private void showViewBookingsUI() {
         StringBuilder bookingDetails = new StringBuilder("Your Bookings:\n");
         for (Booking booking : bookings) {
-            bookingDetails.append("Hall: ").append(booking.getHallType())
-                    .append(", Date: ").append(booking.getDate())
-                    .append(", Time: ").append(booking.getTime())
+            bookingDetails.append("Hall: ").append(booking.getHall().getHallName())
+                    .append(", Date: ").append(booking.getBookingDate())
+                    .append(", Time: ").append(booking.getBookingTime())
                     .append("\n");
         }
         JOptionPane.showMessageDialog(this, bookingDetails.toString());
     }
 
-    private void showCancelBookingUI() {
-        String bookingToCancel = JOptionPane.showInputDialog("Enter the date of the booking to cancel (YYYY-MM-DD):");
-        boolean bookingFound = false;
-        for (Booking booking : bookings) {
-            if (booking.getDate().equals(bookingToCancel)) {
-                bookings.remove(booking);
+   private void showCancelBookingUI() {
+    String bookingToCancel = JOptionPane.showInputDialog("Enter the date of the booking to cancel (YYYY-MM-DD):");
+    boolean bookingFound = false;
+    
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    
+    for (int i = 0; i < bookings.size(); i++) {
+        Booking booking = bookings.get(i);
+        String bookingDateStr = dateFormat.format(booking.getBookingDate());
+        
+        if (bookingDateStr.equals(bookingToCancel)) {
+            try {
+                booking.cancelBooking(); // Check if the booking can be canceled
+                bookings.remove(i); // Remove from the list
                 bookingFound = true;
                 JOptionPane.showMessageDialog(this, "Booking for " + bookingToCancel + " has been canceled.");
-                break;
+                
+                // Update the data in DataIO
+                DataIO.writeBookings(); 
+                
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
-        }
-        if (!bookingFound) {
-            JOptionPane.showMessageDialog(this, "No booking found for " + bookingToCancel);
+            break;
         }
     }
+    
+    if (!bookingFound) {
+        JOptionPane.showMessageDialog(this, "No booking found for " + bookingToCancel);
+    }
+}
+
 
     private void showRaiseIssueUI() {
         JFrame issueFrame = new JFrame("Raise an Issue");
@@ -214,11 +274,5 @@ public class BookingSystem extends JFrame {
             default:
                 return 0.0;
         }
-    }
-
-    public static void main(String[] args) {
-        User defaultUser = new User("username", "password", "email", "phone", "customer");
-        BookingSystem bookingSystem = new BookingSystem(defaultUser);
-        bookingSystem.setVisible(true);
     }
 }
