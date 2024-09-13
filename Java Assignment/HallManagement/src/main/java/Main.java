@@ -8,12 +8,13 @@ public class Main {
     public static PageManagerManagement a7;
     public static BookingSystem a8;
     public static PageScheduler a9;
+    public static PageEditAdminProfile a10;
 
     public static User defaultUser; // Keep track of the logged-in user
 
     public static void main(String[] args) {
         DataIO.read(); // Read all the data
-        
+        Admin admin= DataIO.getLoggedAdmin();
         a1 = new PageLoginSignIn();
         // Assuming defaultUser gets set after successful login
         defaultUser = DataIO.checkUserid("someUserId"); // Example of getting the user

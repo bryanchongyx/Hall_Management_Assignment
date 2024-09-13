@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,7 +44,7 @@ public class PageSchedulerManagement implements ActionListener {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    rowSorter.setRowFilter(javax.swing.RowFilter.regexFilter("(?i)" + text));
+                    rowSorter.setRowFilter(javax.swing.RowFilter.regexFilter("(?i)" + text,2));
                 }
             }
         });
@@ -143,20 +144,25 @@ public class PageSchedulerManagement implements ActionListener {
                         String newFullName = JOptionPane.showInputDialog("Edit Full Name:", schedulerToEdit.getFullname()).trim();
                         if (newFullName != null && !newFullName.trim().isEmpty()) {
                             schedulerToEdit.setFullname(newFullName);
+                            DataIO.updateSchedulerFullname (currentUserid, newFullName);
+                            DataIO.updateUserFullname (currentUserid, newFullName);
+                            
                         }
                         
-                        String newUsername = JOptionPane.showInputDialog("Edit Username:", schedulerToEdit.getUserid()).trim();
-                        if (newUsername != null && !newUsername.trim().isEmpty() && !newUsername.equals(currentUserid)) {
+                        String newUserid = JOptionPane.showInputDialog("Edit User ID:", schedulerToEdit.getUserid()).trim();
+                        if (newUserid != null && !newUserid.trim().isEmpty() && !newUserid.equals(currentUserid)) {
                             // Update username
-                            schedulerToEdit.setUserid(newUsername);
-                            DataIO.updateSchedulerUserid(currentUserid, newUsername);
-                            DataIO.updateUserUserid(currentUserid, newUsername);
+                            schedulerToEdit.setUserid(newUserid);
+                            DataIO.updateSchedulerUserid(currentUserid, newUserid);
+                            DataIO.updateUserUserid(currentUserid, newUserid);
                         }
 
 
                         String newPassword = JOptionPane.showInputDialog("Edit Password:", schedulerToEdit.getPassword()).trim();
                         if (newPassword != null && !newPassword.trim().isEmpty()) {
                             schedulerToEdit.setPassword(newPassword);
+                            DataIO.updateSchedulerPassword (newUserid, newPassword);
+                            DataIO.updateSchedulerPassword(newUserid, newPassword);
                         }
 
                         DataIO.write(); // Save changes to files

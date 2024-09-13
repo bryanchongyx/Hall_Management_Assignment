@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -136,27 +137,32 @@ public class PageManagerManagement implements ActionListener {
                 // Edit selected manager information
                 int selectedRow = managerTable.getSelectedRow();
                 if (selectedRow != -1) {
-                    String currentUsername = (String) managerTable.getValueAt(selectedRow, 1);
-                    Manager managerToEdit = DataIO.findManagerByUserid(currentUsername);
+                    String currentUserid = (String) managerTable.getValueAt(selectedRow, 1);
+                    Manager managerToEdit = DataIO.findManagerByUserid(currentUserid);
 
                     if (managerToEdit != null) {
                         String newFullName = JOptionPane.showInputDialog("Edit Full Name:", managerToEdit.getFullname()).trim();
                         if (newFullName != null && !newFullName.trim().isEmpty()) {
                             managerToEdit.setFullname(newFullName);
+                            DataIO.updateManagerFullname (currentUserid, newFullName);
+                            DataIO.updateUserFullname (currentUserid, newFullName);
+                            
                         }
                         
-                        String newUsername = JOptionPane.showInputDialog("Edit Username:", managerToEdit.getUserid()).trim();
-                        if (newUsername != null && !newUsername.trim().isEmpty() && !newUsername.equals(currentUsername)) {
+                        String newUserid = JOptionPane.showInputDialog("Edit User ID:", managerToEdit.getUserid()).trim();
+                        if (newUserid != null && !newUserid.trim().isEmpty() && !newUserid.equals(currentUserid)) {
                             // Update username
-                            managerToEdit.setUserid(newUsername);
-                            DataIO.updateManagerUserid(currentUsername, newUsername);
-                            DataIO.updateUserUserid(currentUsername, newUsername);
+                            managerToEdit.setUserid(newUserid);
+                            DataIO.updateManagerUserid(currentUserid, newUserid);
+                            DataIO.updateUserUserid(currentUserid, newUserid);
                         }
                         
 
                         String newPassword = JOptionPane.showInputDialog("Edit Password:", managerToEdit.getPassword()).trim();
                         if (newPassword != null && !newPassword.trim().isEmpty()) {
                             managerToEdit.setPassword(newPassword);
+                            DataIO.updateManagerPassword(newUserid, newPassword);
+                            DataIO.updateUserPassword (newUserid, newPassword);
                         }
 
                         DataIO.write(); // Save changes to files

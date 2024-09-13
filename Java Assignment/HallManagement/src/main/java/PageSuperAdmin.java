@@ -3,6 +3,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -14,11 +15,13 @@ import javax.swing.table.DefaultTableModel;
 
 public class PageSuperAdmin implements ActionListener {
     JFrame a;
-    JButton create, delete, logout;
+    JButton create, delete, logout, edit;
     JTable adminTable;
     DefaultTableModel tableModel;
+    User user;
     
-    public PageSuperAdmin() {
+    public PageSuperAdmin(User user) {
+        this.user = user;
         a = new JFrame();
         a.setTitle("Create & Delete Administrator");
         a.setSize(600, 300);
@@ -29,10 +32,12 @@ public class PageSuperAdmin implements ActionListener {
         create = new JButton("Create");
         delete = new JButton("Delete");
         logout = new JButton("Logout");
+        edit = new JButton ("Edit");
         
         create.addActionListener(this);
         delete.addActionListener(this);
         logout.addActionListener(this);
+        edit.addActionListener (this);
         
         a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -53,6 +58,7 @@ public class PageSuperAdmin implements ActionListener {
         JPanel bottomPanel = new JPanel(new FlowLayout());
         bottomPanel.add(create);
         bottomPanel.add(delete);
+        bottomPanel.add(edit);
         bottomPanel.add(logout);
 
         a.add(scrollPane, BorderLayout.CENTER);
@@ -114,8 +120,37 @@ public class PageSuperAdmin implements ActionListener {
                     JOptionPane.showMessageDialog(a, "Selected administrators deleted successfully.");
                 }
             }
+            else if (e.getSource() == edit){
+                
+                //prompt new details
+                String newFullname = JOptionPane.showInputDialog ("Edit Full Name:", user.getFullname()).trim();
+                if (newFullname != null && !newFullname.isEmpty()){
+                    user.setFullname (newFullname);
+                    DataIO.updateUserFullname (user.getUserid(), newFullname);
+                }
+                
+                String newUserid = JOptionPane.showInputDialog("Edit User ID:", user.getUserid()).trim();
+                if (newUserid != null && !newUserid.isEmpty() && !newUserid.equals (user.getUserid())){
+                DataIO.updateUserUserid (user.getUserid(), newUserid);
+                user.setUserid (newUserid);
+            }
+                else {
+                    JOptionPane.showMessageDialog (a, "User ID is already taken!");
+                    return;
+                }
+                String newPassword = JOptionPane.showInputDialog ("Edit Password:", user.getPassword()).trim();
+                if (newPassword != null && !newPassword.isEmpty()){
+                    user.setPassword (newPassword);
+                    DataIO.updateUserPassword (user.getUserid(), newPassword);
+                    
+                }
+                
+                //Save data 
+                DataIO.write();
+                JOptionPane.showMessageDialog (a, "SuperAdmin details updated succesfully");
+            }
             
-            else if (e.getSource()== logout){
+            else if  (e.getSource()== logout){
                 a.setVisible(false);
                 Main.a1.a.setVisible (true);
             }

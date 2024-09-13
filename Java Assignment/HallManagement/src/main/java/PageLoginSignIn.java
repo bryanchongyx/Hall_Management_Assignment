@@ -2,6 +2,7 @@ import java.awt.Button;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -53,15 +54,23 @@ public void actionPerformed(ActionEvent e) {
 
                 // Show the appropriate page based on the role
                 if ("superadmin".equals(role)) {
+                    User user = DataIO.findSuperAdminByUserid(userid_input);
                     if (Main.a4 == null) {
-                        Main.a4 = new PageSuperAdmin(); // Instantiate if not already created
+                        Main.a4 = new PageSuperAdmin(user); // Instantiate if not already created
                     }
+                    a.setVisible(false);
                     Main.a4.a.setVisible(true);
+
                 } else if ("administrator".equals(role)) {
-                    if (Main.a2 == null) {
-                        Main.a2 = new PageAdmin(); // Instantiate if not already created
+                    Admin loggedAdmin = DataIO.findAdminByUserId(userid_input);
+                    if (loggedAdmin == null){
+                        throw new Exception ("Admin details not found");
                     }
-                    Main.a2.a.setVisible(true);
+                    else if (Main.a2 == null){
+                        Main.a2 = new PageAdmin (loggedAdmin);
+                        a.setVisible(false);
+                        Main.a2.a.setVisible(true);
+                    }
                 } else if ("scheduler".equals(role)) {
                     if(Main.a9 == null){
                         Main.a9 = new PageScheduler();

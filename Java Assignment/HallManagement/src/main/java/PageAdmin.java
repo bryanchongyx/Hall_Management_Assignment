@@ -2,17 +2,20 @@
 import java.awt.Button;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import javax.swing.JFrame;
 import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 
 public class PageAdmin implements ActionListener {
     JFrame a;
     Button scheduler, customer, booking, logout, manager,edit;
-
+    Admin admin;
     
-    public PageAdmin (){
+    
+    public PageAdmin (Admin admin){
+        this.admin = admin;
         a = new JFrame();
         a.setTitle ("Admin Page");
         a.setSize (400, 200);
@@ -72,7 +75,9 @@ public class PageAdmin implements ActionListener {
         }
         else if (e.getSource () == edit){
             a.setVisible(false);
-            
+            if (Main.a10 == null){
+                Main.a10 = new PageEditAdminProfile (admin);
+            }
         }
         else if (e.getSource()==logout){
             a.setVisible (false);

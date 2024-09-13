@@ -1,7 +1,9 @@
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
+
 import javax.swing.JOptionPane;
 
 public class DataIO {
@@ -308,6 +310,16 @@ public class DataIO {
         return null;
     }
 
+    //Find superadmin by User ID
+    public static User findSuperAdminByUserid(String userid) {
+        for (User user : allUser) { // Assuming allUser is a List<User> containing all users
+            if (user.getUserid().equals(userid) && user.getRoles().equals ("superadmin")) {
+                return (User) user; // Cast the User to SuperAdmin
+            }
+        }
+        return null; // Return null if no matching SuperAdmin is found
+    }
+
     // Scheduler lookup methods
     public static Scheduler checkSchedulerUserid(String username) {
         for (Scheduler scheduler : allScheduler) {
@@ -350,37 +362,143 @@ public class DataIO {
         }
     }
 
-    // Method to update a user's user ID
-    public static void updateUserUserid(String oldUsername, String newUsername) {
+    // Update User UserID
+    public static void updateUserUserid(String oldUserid, String newUserid) {
         for (User user : allUser) {
-            if (user.getUserid().equals(oldUsername)) {
-                user.setUserid(newUsername);
+            if (user.getUserid().equals(oldUserid)) {
+                user.setUserid(newUserid);
                 break;
             }
         }
     }
 
-    // Method to update a scheduler's user ID
-    public static void updateSchedulerUserid(String oldUsername, String newUsername) {
+    // Update Scheduler UserID
+    public static void updateSchedulerUserid(String oldUserid, String newUserid) {
         for (Scheduler scheduler : allScheduler) {
-            if (scheduler.getUserid().equals(oldUsername)) {
-                scheduler.setUserid(newUsername);
+            if (scheduler.getUserid().equals(oldUserid)) {
+                scheduler.setUserid(newUserid);
                 break;
             }
         }
-        updateUserUserid(oldUsername, newUsername); // Update in users list
+        updateUserUserid(oldUserid, newUserid); // Update in users list
     }
 
-    // Method to update a manager's user ID
-    public static void updateManagerUserid(String oldUsername, String newUsername) {
+    // Update Manager UserID
+    public static void updateManagerUserid(String oldUserid, String newUserid) {
         for (Manager manager : allManager) {
-            if (manager.getUserid().equals(oldUsername)) {
-                manager.setUserid(newUsername);
+            if (manager.getUserid().equals(oldUserid)) {
+                manager.setUserid(newUserid);
                 break;
             }
         }
-        updateUserUserid(oldUsername, newUsername); // Update in users list
+        updateUserUserid(oldUserid, newUserid); // Update in users list
     }
+    
+    //Update Admin UserID
+    public static void updateAdminUserid(String oldUserid, String newUserid) {
+        for (Admin admin : allAdmin) {
+            if (admin.getUserid().equals(oldUserid)) {
+                admin.setUserid(newUserid);
+                break;
+            }
+        }
+        updateUserUserid (oldUserid, newUserid); //Update in users list
+    }
+    
+    // Update User Fullname
+    public static void updateUserFullname(String oldUserid, String newFullname) {
+        for (User user : allUser) {
+            if (user.getUserid().equals(oldUserid)) {
+                user.setFullname(newFullname);
+                break;
+            }
+        }
+    }
+
+    // Update Scheduler Fullname
+    public static void updateSchedulerFullname(String userid, String newFullname) {
+        for (Scheduler scheduler : allScheduler) {
+            if (scheduler.getUserid().equals(userid)) {
+                scheduler.setFullname(newFullname);
+                break;
+            }
+        }
+        updateUserFullname(userid, newFullname); // Update in users list
+    }
+
+    // Update Manager Fullname
+    public static void updateManagerFullname(String userid, String newFullname) {
+        for (Manager manager : allManager) {
+            if (manager.getUserid().equals(userid)) {
+                manager.setFullname(newFullname);
+                break;
+            }
+        }
+        updateUserFullname(userid, newFullname); // Update in users list
+    }
+
+    // Update Admin Fullname
+    public static void updateAdminFullname(String userid, String newFullname) {
+        for (Admin admin : allAdmin) {
+            if (admin.getUserid().equals(userid)) {
+                admin.setFullname(newFullname);
+                break;
+            }
+        }
+        updateUserFullname(userid, newFullname); // Update in users list
+    }
+
+    // Update User Password
+    public static void updateUserPassword(String userid, String newPassword) {
+        for (User user : allUser) {
+            if (user.getUserid().equals(userid)) {
+                user.setPassword(newPassword);
+                break;
+            }
+        }
+    }
+
+    // Update Scheduler Password
+    public static void updateSchedulerPassword(String userid, String newPassword) {
+        for (Scheduler scheduler : allScheduler) {
+            if (scheduler.getUserid().equals(userid)) {
+                scheduler.setPassword(newPassword);
+                break;
+            }
+        }
+        updateUserPassword(userid, newPassword); // Update in users list
+    }
+
+    // Update Manager Password
+    public static void updateManagerPassword(String userid, String newPassword) {
+        for (Manager manager : allManager) {
+            if (manager.getUserid().equals(userid)) {
+                manager.setPassword(newPassword);
+                break;
+            }
+        }
+        updateUserPassword(userid, newPassword); // Update in users list
+    }
+
+    // Update Admin Password
+    public static void updateAdminPassword(String userid, String newPassword) {
+        for (Admin admin : allAdmin) {
+            if (admin.getUserid().equals(userid)) {
+                admin.setPassword(newPassword);
+                break;
+            }
+        }
+        updateUserPassword(userid, newPassword); // Update in users list
+    }
+    // get logged Admin
+    public static Admin getLoggedAdmin() {
+        // Implement logic to retrieve the currently logged-in admin.
+        // This could be from a session, or simply the first admin in the list for testing purposes.
+        if (!allAdmin.isEmpty()) {
+            return allAdmin.get(0); // Assuming the first admin is the logged-in admin
+        }
+        return null;   
+        }
 
     // Method to find a hall by name
     public static Hall findHallByName(String hallName) {
