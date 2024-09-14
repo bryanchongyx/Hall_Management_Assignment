@@ -1,6 +1,7 @@
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,10 +57,10 @@ public class PageRegistrationForm implements ActionListener {
         if (e.getSource() == registerButton) {
             try {
                 String reg_fullname = fullnameField.getText().trim();
-                String reg_email = emailField.getText().trim();
-                String reg_phone = phoneField.getText().trim();
                 String reg_userid = useridField.getText().trim();
                 String reg_password = passwordField.getText().trim();
+                String reg_email = emailField.getText().trim();
+                String reg_phone = phoneField.getText().trim();
 
                 // Input validation
                 if (reg_fullname.isEmpty() || reg_email.isEmpty() || reg_phone.isEmpty() || reg_userid.isEmpty() || reg_password.isEmpty()) {
@@ -102,10 +103,11 @@ public class PageRegistrationForm implements ActionListener {
     }
         private void clearFields() {
         fullnameField.setText("");
-        emailField.setText("");
-        phoneField.setText("");
         useridField.setText("");
         passwordField.setText("");
+        emailField.setText("");
+        phoneField.setText("");
+
     }
 
 }

@@ -9,6 +9,7 @@ public class Main {
     public static BookingSystem a8;
     public static PageScheduler a9;
     public static PageEditAdminProfile a10;
+    public static PageAdminManagement a11;
 
     public static User defaultUser; // Keep track of the logged-in user
 

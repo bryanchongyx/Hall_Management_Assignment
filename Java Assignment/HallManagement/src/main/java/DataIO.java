@@ -84,9 +84,9 @@ public class DataIO {
                 String line = scanner.nextLine();
                 String[] customerData = line.split(",");
                 if (customerData.length == 5) {
+                    String fullname = customerData[2].trim();
                     String userid = customerData[0].trim();
                     String password = customerData[1].trim();
-                    String fullname = customerData[2].trim();
                     String email = customerData[3].trim();
                     String ph_number = customerData[4].trim();
                     allCustomer.add(new Customer(fullname, userid, password, email, ph_number));
