@@ -78,7 +78,7 @@ public void actionPerformed(ActionEvent e) {
                 } else if ("customer".equals(role)) {
                     // Only instantiate and show BookingSystem if the user is a customer
                     if (Main.a8 == null) {
-                        Main.a8 = new BookingSystem(foundUser); // Instantiate BookingSystem with the logged-in user
+                        Main.a8 = new PageBookingSystem(foundUser); // Instantiate BookingSystem with the logged-in user
                     }
                     Main.a8.setVisible(true);
                 } else if ("manager".equals(role)) {
@@ -98,6 +98,10 @@ public void actionPerformed(ActionEvent e) {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(a, ex.getMessage());
         }
+    }
+
+    public void setVisible(boolean b) {
+        a.setVisible(true);
     }
 
 }

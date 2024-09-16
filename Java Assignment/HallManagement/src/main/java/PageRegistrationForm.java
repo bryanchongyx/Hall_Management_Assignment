@@ -17,8 +17,8 @@ public class PageRegistrationForm implements ActionListener {
 
     public PageRegistrationForm() {
         a = new JFrame("Registration Form");
-        a.setSize(400, 300);
-        a.setLocation(600, 300);
+        a.setSize(475, 300);
+        a.setLocation(550, 300);
         a.setLayout(new GridLayout(7, 2, 10, 10));
 
         // Initialize form components

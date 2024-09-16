@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class BookingSystem extends JFrame {
+public class PageBookingSystem extends JFrame {
     private List<Hall> halls;
     private List<Booking> bookings;
     private User currentUser;
 
-    public BookingSystem(User user) {
+    public PageBookingSystem(User user) {
         this.currentUser = user;
         this.halls = DataIO.allHall; // Assuming you load halls from DataIO
         this.bookings = DataIO.allBooking; // Assuming you load bookings from DataIO
@@ -22,6 +22,7 @@ public class BookingSystem extends JFrame {
     private void initializeUI() {
         setTitle("Hall Booking System");
         setSize(600, 400);
+        setLocation (525, 250);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
 
@@ -40,6 +41,10 @@ public class BookingSystem extends JFrame {
         JButton raiseIssueButton = new JButton("Raise an Issue");
         raiseIssueButton.setBounds(50, 200, 150, 30);
         add(raiseIssueButton);
+
+        JButton logoutButton = new JButton ("Logout");
+        logoutButton.setBounds (50, 250, 150, 30);
+        add (logoutButton);
 
         bookHallButton.addActionListener(new ActionListener() {
             @Override
@@ -69,14 +74,22 @@ public class BookingSystem extends JFrame {
             }
         });
 
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+                Main.a1.setVisible(true);
+            }
+        });
+
         setVisible(true);
     }
 
     private void showBookingUI() {
         JFrame bookingFrame = new JFrame("Book a Hall");
-        bookingFrame.setSize(400, 300);
+        bookingFrame.setSize(400, 400);
         bookingFrame.setLayout(null);
-        bookingFrame.setLocation (400,400);
+        bookingFrame.setLocation (600,300);
 
         JButton auditoriumButton = new JButton("Auditorium");
         auditoriumButton.setBounds(50, 50, 150, 30);
@@ -89,6 +102,10 @@ public class BookingSystem extends JFrame {
         JButton banquetHallButton = new JButton("Banquet Hall");
         banquetHallButton.setBounds(50, 150, 150, 30);
         bookingFrame.add(banquetHallButton);
+
+        JButton backButton = new JButton ("Back");
+        backButton.setBounds (50, 200, 150, 30);
+        bookingFrame.add (backButton);
 
         auditoriumButton.addActionListener(new ActionListener() {
             @Override
@@ -108,6 +125,15 @@ public class BookingSystem extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 handleBooking("Banquet Hall");
+            }
+        });
+
+        backButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed (ActionEvent e){
+                bookingFrame.dispose();
+                setVisible (true);
+                
             }
         });
 
@@ -220,6 +246,7 @@ public class BookingSystem extends JFrame {
         JFrame issueFrame = new JFrame("Raise an Issue");
         issueFrame.setSize(400, 300);
         issueFrame.setLayout(null);
+        issueFrame.setLocation (575,275);
 
         JButton acIssueButton = new JButton("Fix the Air Condition");
         acIssueButton.setBounds(50, 50, 200, 30);

@@ -6,7 +6,7 @@ public class Main {
     public static PageSchedulerManagement a5;
     public static PageCustomerManagement a6;
     public static PageManagerManagement a7;
-    public static BookingSystem a8;
+    public static PageBookingSystem a8;
     public static PageScheduler a9;
     public static PageEditAdminProfile a10;
     public static PageAdminManagement a11;
