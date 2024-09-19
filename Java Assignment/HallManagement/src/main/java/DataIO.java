@@ -490,15 +490,6 @@ public class DataIO {
         }
         updateUserPassword(userid, newPassword); // Update in users list
     }
-    // get logged Admin
-    public static Admin getLoggedAdmin() {
-        // Implement logic to retrieve the currently logged-in admin.
-        // This could be from a session, or simply the first admin in the list for testing purposes.
-        if (!allAdmin.isEmpty()) {
-            return allAdmin.get(0); // Assuming the first admin is the logged-in admin
-        }
-        return null;   
-        }
 
     // Method to find a hall by name
     public static Hall findHallByName(String hallName) {
