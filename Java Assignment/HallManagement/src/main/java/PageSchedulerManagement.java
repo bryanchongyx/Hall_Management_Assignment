@@ -1,18 +1,10 @@
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -22,21 +14,22 @@ public class PageSchedulerManagement implements ActionListener {
     JButton add, edit, delete, logout, back;
     JTable schedulerTable;
     DefaultTableModel tableModel;
-    JTextField filterField; // For filtering
+    JTextField filterField;
     TableRowSorter<DefaultTableModel> rowSorter;
     PageAdmin adminPage;
 
     public PageSchedulerManagement(PageAdmin adminPage) {
         this.adminPage = adminPage;
-        
+
         a = new JFrame();
         a.setTitle("Scheduler Staff Management");
-        a.setSize(600, 350);
-        a.setLocation(500, 325);
+        a.setSize(700, 500); // Adjusted size for better fit
+        a.setLocationRelativeTo(null); // Center the frame
         a.setLayout(new BorderLayout());
+        a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Filter Field Setup
-        filterField = new JTextField(15);
+        filterField = new JTextField(20);
         filterField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -44,17 +37,15 @@ public class PageSchedulerManagement implements ActionListener {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    // Custom RowFilter to search across all columns
                     rowSorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
                         @Override
                         public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
                             for (int i = 0; i < entry.getValueCount(); i++) {
-                                // Check if any column contains the filter text
                                 if (entry.getStringValue(i).toLowerCase().contains(text.toLowerCase())) {
-                                    return true; // If found, include this row
+                                    return true;
                                 }
                             }
-                            return false; // If not found, exclude this row
+                            return false;
                         }
                     });
                 }
@@ -65,7 +56,7 @@ public class PageSchedulerManagement implements ActionListener {
         add = new JButton("Add");
         edit = new JButton("Edit");
         delete = new JButton("Delete");
-        back = new JButton ("Back");
+        back = new JButton("Back");
         logout = new JButton("Logout");
 
         add.addActionListener(this);
@@ -73,18 +64,16 @@ public class PageSchedulerManagement implements ActionListener {
         delete.addActionListener(this);
         logout.addActionListener(this);
         back.addActionListener(this);
-        
-        a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Table Setup
-        String[] columnNames = {"Full Name", "Username","Password", "Joined Date", "Select"};
-        tableModel = new DefaultTableModel(columnNames, 0);
-        schedulerTable = new JTable(tableModel) {
+        String[] columnNames = {"Full Name", "Username", "Password", "Joined Date", "Select"};
+        tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public Class<?> getColumnClass(int column) {
                 return column == 4 ? Boolean.class : String.class;
             }
         };
+        schedulerTable = new JTable(tableModel);
         rowSorter = new TableRowSorter<>(tableModel);
         schedulerTable.setRowSorter(rowSorter);
 
@@ -93,21 +82,23 @@ public class PageSchedulerManagement implements ActionListener {
         JScrollPane scrollPane = new JScrollPane(schedulerTable);
 
         // Top panel for filter input
-        JPanel filterPanel = new JPanel(new FlowLayout());
-        filterPanel.add(new JLabel ("Search:"));
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.add(new JLabel("Search:"));
         filterPanel.add(filterField);
 
         // Bottom panel for buttons
-        JPanel bottomPanel = new JPanel(new FlowLayout());
+        JPanel bottomPanel = new JPanel(new GridLayout(1, 5, 10, 10));
         bottomPanel.add(add);
         bottomPanel.add(edit);
         bottomPanel.add(delete);
         bottomPanel.add(logout);
-        bottomPanel.add (back);
+        bottomPanel.add(back);
 
+        // Add panels and scroll pane to the frame
         a.add(filterPanel, BorderLayout.NORTH);
         a.add(scrollPane, BorderLayout.CENTER);
         a.add(bottomPanel, BorderLayout.SOUTH);
+
         a.setVisible(true);
     }
 
@@ -120,7 +111,7 @@ public class PageSchedulerManagement implements ActionListener {
             tableModel.addRow(rowData);
         }
     }
-    
+
     public void showPage() {
         a.setVisible(true); // Make the frame visible
     }
@@ -148,8 +139,15 @@ public class PageSchedulerManagement implements ActionListener {
 
             } else if (e.getSource() == edit) {
                 // Edit selected scheduler information
-                int selectedRow = schedulerTable.getSelectedRow();
-                if (selectedRow != -1) {
+                int[] selectedRows = schedulerTable.getSelectedRows();
+
+                if (selectedRows.length > 1) {
+                    JOptionPane.showMessageDialog(a, "Please select exactly one user to edit.");
+                } else if (selectedRows.length == 0) {
+                    JOptionPane.showMessageDialog(a, "Please select a user to edit.");
+                } else {
+                    int selectedRow = selectedRows[0];
+
                     String currentUserid = (String) schedulerTable.getValueAt(selectedRow, 1);
                     Scheduler schedulerToEdit = DataIO.findSchedulerByUserid(currentUserid);
 
@@ -157,33 +155,28 @@ public class PageSchedulerManagement implements ActionListener {
                         String newFullName = JOptionPane.showInputDialog("Edit Full Name:", schedulerToEdit.getFullname()).trim();
                         if (newFullName != null && !newFullName.trim().isEmpty()) {
                             schedulerToEdit.setFullname(newFullName);
-                            DataIO.updateSchedulerFullname (currentUserid, newFullName);
-                            DataIO.updateUserFullname (currentUserid, newFullName);
-                            
+                            DataIO.updateSchedulerFullname(currentUserid, newFullName);
+                            DataIO.updateUserFullname(currentUserid, newFullName);
                         }
-                        
+
                         String newUserid = JOptionPane.showInputDialog("Edit User ID:", schedulerToEdit.getUserid()).trim();
                         if (newUserid != null && !newUserid.trim().isEmpty() && !newUserid.equals(currentUserid)) {
-                            // Update username
                             schedulerToEdit.setUserid(newUserid);
                             DataIO.updateSchedulerUserid(currentUserid, newUserid);
                             DataIO.updateUserUserid(currentUserid, newUserid);
                         }
 
-
                         String newPassword = JOptionPane.showInputDialog("Edit Password:", schedulerToEdit.getPassword()).trim();
                         if (newPassword != null && !newPassword.trim().isEmpty()) {
                             schedulerToEdit.setPassword(newPassword);
-                            DataIO.updateSchedulerPassword (newUserid, newPassword);
                             DataIO.updateSchedulerPassword(newUserid, newPassword);
+                            DataIO.updateUserPassword(newUserid, newPassword);
                         }
 
                         DataIO.write(); // Save changes to files
                         loadSchedulerData(); // Refresh table data
                         JOptionPane.showMessageDialog(a, "Scheduler information updated successfully.");
                     }
-                } else {
-                    JOptionPane.showMessageDialog(a, "Please select a scheduler to edit.");
                 }
 
             } else if (e.getSource() == delete) {
@@ -212,9 +205,7 @@ public class PageSchedulerManagement implements ActionListener {
             } else if (e.getSource() == logout) {
                 a.setVisible(false);
                 Main.a1.a.setVisible(true);
-            }
-            
-            else if (e.getSource() == back){
+            } else if (e.getSource() == back) {
                 a.setVisible(false);
                 adminPage.a.setVisible(true);
             }

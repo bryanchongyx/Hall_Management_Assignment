@@ -1,5 +1,8 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -31,8 +34,8 @@ public class PageManagerManagement implements ActionListener {
 
         a = new JFrame();
         a.setTitle("Manager Staff Management");
-        a.setSize(700, 350);
-        a.setLocation(500, 325);
+        a.setSize(700, 500);
+        a.setLocationRelativeTo(null); // Center the frame
         a.setLayout(new BorderLayout());
 
         // Buttons
@@ -42,16 +45,20 @@ public class PageManagerManagement implements ActionListener {
         logout = new JButton("Logout");
         back = new JButton("Back");
 
-        add.addActionListener(this);
-        edit.addActionListener(this);
-        delete.addActionListener(this);
-        back.addActionListener(this);
-        logout.addActionListener(this);
+        JButton[] buttons = {add, edit, delete, logout, back};
+        for (JButton button : buttons) {
+            button.setFont(new Font("Arial", Font.BOLD, 12));
+            button.setPreferredSize(new Dimension(100, 30));
+            button.setBackground(new Color(51, 153, 255)); // Blue color
+            button.setForeground(Color.WHITE);
+            button.setFocusPainted(false);
+            button.addActionListener(this);
+        }
 
         a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Table Setup
-        String[] columnNames = {"Full Name", "Username", "Password","Joined Date", "Select"};
+        String[] columnNames = {"Full Name", "Username", "Password", "Joined Date", "Select"};
         tableModel = new DefaultTableModel(columnNames, 0);
         managerTable = new JTable(tableModel) {
             @Override
@@ -66,13 +73,15 @@ public class PageManagerManagement implements ActionListener {
         JScrollPane scrollPane = new JScrollPane(managerTable);
 
         // Filter panel
-        JPanel filterPanel = new JPanel(new FlowLayout());
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.setBackground(Color.LIGHT_GRAY);
         filterPanel.add(new JLabel("Search:"));
         filterField = new JTextField(20);
+        filterField.setPreferredSize(new Dimension(200, 30));
+        filterField.setFont(new Font("Arial", Font.PLAIN, 14));
         filterPanel.add(filterField);
 
         // Filter Field Setup
-        filterField = new JTextField(15);
         filterField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -98,7 +107,8 @@ public class PageManagerManagement implements ActionListener {
         });
 
         // Bottom panel for buttons
-        JPanel bottomPanel = new JPanel(new FlowLayout());
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        bottomPanel.setBackground(Color.GRAY);
         bottomPanel.add(add);
         bottomPanel.add(edit);
         bottomPanel.add(delete);
@@ -115,7 +125,7 @@ public class PageManagerManagement implements ActionListener {
     private void loadManagerData() {
         tableModel.setRowCount(0); // Clear existing data
         for (Manager manager : DataIO.allManager) {
-            Object[] rowData = {manager.getFullname(), manager.getUserid(),manager.getPassword(),
+            Object[] rowData = {manager.getFullname(), manager.getUserid(), manager.getPassword(),
                 manager.getJoinedDate(), false};
             tableModel.addRow(rowData);
         }
@@ -147,60 +157,59 @@ public class PageManagerManagement implements ActionListener {
                 loadManagerData(); // Refresh table data
 
             } else if (e.getSource() == edit) {
-            // Get selected rows
-            int[] selectedRows = managerTable.getSelectedRows();
+                // Get selected rows
+                int[] selectedRows = managerTable.getSelectedRows();
 
-            if (selectedRows.length != 1) {
-                // Show a message if no manager or multiple managers are selected
-                JOptionPane.showMessageDialog(a, "Please select exactly one manager to edit.");
-            } else {
-                // Get the selected row index
-                int selectedRow = selectedRows[0];
+                if (selectedRows.length > 1) {
+                    // Show a message if no manager or multiple managers are selected
+                    JOptionPane.showMessageDialog(a, "Please select exactly one user to edit.");
+                } else if (selectedRows.length == 0) {
+                    JOptionPane.showMessageDialog(a, "Please select a user to edit.");
+                } else {
+                    // Get the selected row index
+                    int selectedRow = selectedRows[0];
 
-                // Get the current UserID of the selected manager
-                String currentUserid = (String) managerTable.getValueAt(selectedRow, 1);
+                    // Get the current UserID of the selected manager
+                    String currentUserid = (String) managerTable.getValueAt(selectedRow, 1);
 
-                // Find the manager by UserID
-                Manager managerToEdit = DataIO.findManagerByUserid(currentUserid);
+                    // Find the manager by UserID
+                    Manager managerToEdit = DataIO.findManagerByUserid(currentUserid);
 
-                if (managerToEdit != null) {
-                    // Prompt to edit Full Name
-                    String newFullName = JOptionPane.showInputDialog(a, "Edit Full Name:", managerToEdit.getFullname()).trim();
-                    if (newFullName != null && !newFullName.trim().isEmpty()) {
-                        managerToEdit.setFullname(newFullName);
-                        DataIO.updateManagerFullname(currentUserid, newFullName);
-                        DataIO.updateUserFullname(currentUserid, newFullName);
+                    if (managerToEdit != null) {
+                        // Prompt to edit Full Name
+                        String newFullName = JOptionPane.showInputDialog(a, "Edit Full Name:", managerToEdit.getFullname()).trim();
+                        if (newFullName != null && !newFullName.trim().isEmpty()) {
+                            managerToEdit.setFullname(newFullName);
+                            DataIO.updateManagerFullname(currentUserid, newFullName);
+                            DataIO.updateUserFullname(currentUserid, newFullName);
+                        }
+
+                        // Prompt to edit User ID
+                        String newUserid = JOptionPane.showInputDialog(a, "Edit User ID:", managerToEdit.getUserid()).trim();
+                        if (newUserid != null && !newUserid.trim().isEmpty() && !newUserid.equals(currentUserid)) {
+                            // Update UserID for both manager and user
+                            managerToEdit.setUserid(newUserid);
+                            DataIO.updateManagerUserid(currentUserid, newUserid);
+                            DataIO.updateUserUserid(currentUserid, newUserid);
+                            currentUserid = newUserid; // Update currentUserid reference
+                        }
+
+                        // Prompt to edit Password
+                        String newPassword = JOptionPane.showInputDialog(a, "Edit Password:", managerToEdit.getPassword()).trim();
+                        if (newPassword != null && !newPassword.trim().isEmpty()) {
+                            managerToEdit.setPassword(newPassword);
+                            DataIO.updateManagerPassword(currentUserid, newPassword); // Use currentUserid which might have been updated
+                            DataIO.updateUserPassword(currentUserid, newPassword);
+                        }
+
+                        // Save changes to files
+                        DataIO.write();
+                        // Refresh table data
+                        loadManagerData();
+                        // Notify the user of the successful update
+                        JOptionPane.showMessageDialog(a, "Manager information updated successfully.");
                     }
-
-                    // Prompt to edit User ID
-                    String newUserid = JOptionPane.showInputDialog(a, "Edit User ID:", managerToEdit.getUserid()).trim();
-                    if (newUserid != null && !newUserid.trim().isEmpty() && !newUserid.equals(currentUserid)) {
-                        // Update UserID for both manager and user
-                        managerToEdit.setUserid(newUserid);
-                        DataIO.updateManagerUserid(currentUserid, newUserid);
-                        DataIO.updateUserUserid(currentUserid, newUserid);
-                        currentUserid = newUserid; // Update currentUserid reference
-                    }
-
-                    // Prompt to edit Password
-                    String newPassword = JOptionPane.showInputDialog(a, "Edit Password:", managerToEdit.getPassword()).trim();
-                    if (newPassword != null && !newPassword.trim().isEmpty()) {
-                        managerToEdit.setPassword(newPassword);
-                        DataIO.updateManagerPassword(currentUserid, newPassword); // Use currentUserid which might have been updated
-                        DataIO.updateUserPassword(currentUserid, newPassword);
-                    }
-
-                    // Save changes to files
-                    DataIO.write();
-                    // Refresh table data
-                    loadManagerData();
-                    // Notify the user of the successful update
-                    JOptionPane.showMessageDialog(a, "Manager information updated successfully.");
                 }
-            }
-
-                
-
             } else if (e.getSource() == delete) {
                 // Delete selected manager staff
                 ArrayList<Manager> managersToDelete = new ArrayList<>();
@@ -228,9 +237,7 @@ public class PageManagerManagement implements ActionListener {
             } else if (e.getSource() == logout) {
                 a.setVisible(false);
                 Main.a1.a.setVisible(true);
-            }
-
-            else if (e.getSource() == back) {
+            } else if (e.getSource() == back) {
                 a.setVisible(false);
                 adminPage.a.setVisible(true);
             }
