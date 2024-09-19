@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -52,12 +51,12 @@ public class PageManagerManagement implements ActionListener {
         a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Table Setup
-        String[] columnNames = {"Full Name", "Username", "Joined Date", "Select"};
+        String[] columnNames = {"Full Name", "Username", "Password","Joined Date", "Select"};
         tableModel = new DefaultTableModel(columnNames, 0);
         managerTable = new JTable(tableModel) {
             @Override
             public Class<?> getColumnClass(int column) {
-                return column == 3 ? Boolean.class : String.class;
+                return column == 4 ? Boolean.class : String.class;
             }
         };
         rowSorter = new TableRowSorter<>(tableModel);
@@ -72,7 +71,8 @@ public class PageManagerManagement implements ActionListener {
         filterField = new JTextField(20);
         filterPanel.add(filterField);
 
-        // Add KeyListener for the filterField
+        // Filter Field Setup
+        filterField = new JTextField(15);
         filterField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -80,7 +80,19 @@ public class PageManagerManagement implements ActionListener {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                    // Custom RowFilter to search across all columns
+                    rowSorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                        @Override
+                        public boolean include(RowFilter.Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                            for (int i = 0; i < entry.getValueCount(); i++) {
+                                // Check if any column contains the filter text
+                                if (entry.getStringValue(i).toLowerCase().contains(text.toLowerCase())) {
+                                    return true; // If found, include this row
+                                }
+                            }
+                            return false; // If not found, exclude this row
+                        }
+                    });
                 }
             }
         });
@@ -103,7 +115,8 @@ public class PageManagerManagement implements ActionListener {
     private void loadManagerData() {
         tableModel.setRowCount(0); // Clear existing data
         for (Manager manager : DataIO.allManager) {
-            Object[] rowData = {manager.getFullname(), manager.getUserid(), manager.getJoinedDate(), false};
+            Object[] rowData = {manager.getFullname(), manager.getUserid(),manager.getPassword(),
+                manager.getJoinedDate(), false};
             tableModel.addRow(rowData);
         }
     }
@@ -134,50 +147,65 @@ public class PageManagerManagement implements ActionListener {
                 loadManagerData(); // Refresh table data
 
             } else if (e.getSource() == edit) {
-                // Edit selected manager information
-                int selectedRow = managerTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    String currentUserid = (String) managerTable.getValueAt(selectedRow, 1);
-                    Manager managerToEdit = DataIO.findManagerByUserid(currentUserid);
+            // Get selected rows
+            int[] selectedRows = managerTable.getSelectedRows();
 
-                    if (managerToEdit != null) {
-                        String newFullName = JOptionPane.showInputDialog("Edit Full Name:", managerToEdit.getFullname()).trim();
-                        if (newFullName != null && !newFullName.trim().isEmpty()) {
-                            managerToEdit.setFullname(newFullName);
-                            DataIO.updateManagerFullname (currentUserid, newFullName);
-                            DataIO.updateUserFullname (currentUserid, newFullName);
-                            
-                        }
-                        
-                        String newUserid = JOptionPane.showInputDialog("Edit User ID:", managerToEdit.getUserid()).trim();
-                        if (newUserid != null && !newUserid.trim().isEmpty() && !newUserid.equals(currentUserid)) {
-                            // Update username
-                            managerToEdit.setUserid(newUserid);
-                            DataIO.updateManagerUserid(currentUserid, newUserid);
-                            DataIO.updateUserUserid(currentUserid, newUserid);
-                        }
-                        
+            if (selectedRows.length != 1) {
+                // Show a message if no manager or multiple managers are selected
+                JOptionPane.showMessageDialog(a, "Please select exactly one manager to edit.");
+            } else {
+                // Get the selected row index
+                int selectedRow = selectedRows[0];
 
-                        String newPassword = JOptionPane.showInputDialog("Edit Password:", managerToEdit.getPassword()).trim();
-                        if (newPassword != null && !newPassword.trim().isEmpty()) {
-                            managerToEdit.setPassword(newPassword);
-                            DataIO.updateManagerPassword(newUserid, newPassword);
-                            DataIO.updateUserPassword (newUserid, newPassword);
-                        }
+                // Get the current UserID of the selected manager
+                String currentUserid = (String) managerTable.getValueAt(selectedRow, 1);
 
-                        DataIO.write(); // Save changes to files
-                        loadManagerData(); // Refresh table data
-                        JOptionPane.showMessageDialog(a, "Manager information updated successfully.");
+                // Find the manager by UserID
+                Manager managerToEdit = DataIO.findManagerByUserid(currentUserid);
+
+                if (managerToEdit != null) {
+                    // Prompt to edit Full Name
+                    String newFullName = JOptionPane.showInputDialog(a, "Edit Full Name:", managerToEdit.getFullname()).trim();
+                    if (newFullName != null && !newFullName.trim().isEmpty()) {
+                        managerToEdit.setFullname(newFullName);
+                        DataIO.updateManagerFullname(currentUserid, newFullName);
+                        DataIO.updateUserFullname(currentUserid, newFullName);
                     }
-                } else {
-                    JOptionPane.showMessageDialog(a, "Please select a manager to edit.");
+
+                    // Prompt to edit User ID
+                    String newUserid = JOptionPane.showInputDialog(a, "Edit User ID:", managerToEdit.getUserid()).trim();
+                    if (newUserid != null && !newUserid.trim().isEmpty() && !newUserid.equals(currentUserid)) {
+                        // Update UserID for both manager and user
+                        managerToEdit.setUserid(newUserid);
+                        DataIO.updateManagerUserid(currentUserid, newUserid);
+                        DataIO.updateUserUserid(currentUserid, newUserid);
+                        currentUserid = newUserid; // Update currentUserid reference
+                    }
+
+                    // Prompt to edit Password
+                    String newPassword = JOptionPane.showInputDialog(a, "Edit Password:", managerToEdit.getPassword()).trim();
+                    if (newPassword != null && !newPassword.trim().isEmpty()) {
+                        managerToEdit.setPassword(newPassword);
+                        DataIO.updateManagerPassword(currentUserid, newPassword); // Use currentUserid which might have been updated
+                        DataIO.updateUserPassword(currentUserid, newPassword);
+                    }
+
+                    // Save changes to files
+                    DataIO.write();
+                    // Refresh table data
+                    loadManagerData();
+                    // Notify the user of the successful update
+                    JOptionPane.showMessageDialog(a, "Manager information updated successfully.");
                 }
+            }
+
+                
 
             } else if (e.getSource() == delete) {
                 // Delete selected manager staff
                 ArrayList<Manager> managersToDelete = new ArrayList<>();
                 for (int i = 0; i < managerTable.getRowCount(); i++) {
-                    boolean isSelected = (boolean) managerTable.getValueAt(i, 3); // Checkbox column
+                    boolean isSelected = (boolean) managerTable.getValueAt(i, 4); // Checkbox column
                     if (isSelected) {
                         String username = (String) managerTable.getValueAt(i, 1); // Username column
                         managersToDelete.add(DataIO.findManagerByUserid(username));

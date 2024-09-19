@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -79,7 +78,8 @@ public class PageCustomerManagement implements ActionListener {
         a.add(bottomPanel, BorderLayout.SOUTH);
         a.setVisible(true);
 
-        // Add KeyListener for the filterField
+        // Filter Field Setup
+        filterField = new JTextField(15);
         filterField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -87,7 +87,19 @@ public class PageCustomerManagement implements ActionListener {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                    // Custom RowFilter to search across all columns
+                    rowSorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                        @Override
+                        public boolean include(RowFilter.Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                            for (int i = 0; i < entry.getValueCount(); i++) {
+                                // Check if any column contains the filter text
+                                if (entry.getStringValue(i).toLowerCase().contains(text.toLowerCase())) {
+                                    return true; // If found, include this row
+                                }
+                            }
+                            return false; // If not found, exclude this row
+                        }
+                    });
                 }
             }
         });

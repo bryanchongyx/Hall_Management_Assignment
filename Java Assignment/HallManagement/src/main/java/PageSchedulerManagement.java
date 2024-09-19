@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -14,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -44,7 +44,19 @@ public class PageSchedulerManagement implements ActionListener {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    rowSorter.setRowFilter(javax.swing.RowFilter.regexFilter("(?i)" + text,2));
+                    // Custom RowFilter to search across all columns
+                    rowSorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                        @Override
+                        public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                            for (int i = 0; i < entry.getValueCount(); i++) {
+                                // Check if any column contains the filter text
+                                if (entry.getStringValue(i).toLowerCase().contains(text.toLowerCase())) {
+                                    return true; // If found, include this row
+                                }
+                            }
+                            return false; // If not found, exclude this row
+                        }
+                    });
                 }
             }
         });
@@ -65,12 +77,12 @@ public class PageSchedulerManagement implements ActionListener {
         a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Table Setup
-        String[] columnNames = {"Full Name", "Username", "Joined Date", "Select"};
+        String[] columnNames = {"Full Name", "Username","Password", "Joined Date", "Select"};
         tableModel = new DefaultTableModel(columnNames, 0);
         schedulerTable = new JTable(tableModel) {
             @Override
             public Class<?> getColumnClass(int column) {
-                return column == 3 ? Boolean.class : String.class;
+                return column == 4 ? Boolean.class : String.class;
             }
         };
         rowSorter = new TableRowSorter<>(tableModel);
@@ -103,7 +115,8 @@ public class PageSchedulerManagement implements ActionListener {
     private void loadSchedulerData() {
         tableModel.setRowCount(0); // Clear existing data
         for (Scheduler scheduler : DataIO.allScheduler) {
-            Object[] rowData = {scheduler.getFullname(), scheduler.getUserid(), scheduler.getJoinedDate(), false};
+            Object[] rowData = {scheduler.getFullname(), scheduler.getUserid(), scheduler.getPassword(),
+                scheduler.getJoinedDate(), false};
             tableModel.addRow(rowData);
         }
     }
@@ -177,7 +190,7 @@ public class PageSchedulerManagement implements ActionListener {
                 // Delete selected scheduler staff
                 ArrayList<Scheduler> schedulersToDelete = new ArrayList<>();
                 for (int i = 0; i < schedulerTable.getRowCount(); i++) {
-                    boolean isSelected = (boolean) schedulerTable.getValueAt(i, 3); // Checkbox column
+                    boolean isSelected = (boolean) schedulerTable.getValueAt(i, 4); // Checkbox column
                     if (isSelected) {
                         String userid = (String) schedulerTable.getValueAt(i, 1); // Username column
                         schedulersToDelete.add(DataIO.findSchedulerByUserid(userid));
