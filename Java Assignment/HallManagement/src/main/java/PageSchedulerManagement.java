@@ -5,7 +5,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -120,25 +119,45 @@ public class PageSchedulerManagement implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         try {
             if (e.getSource() == add) {
-                // Add new scheduler staff
-                String fullname = JOptionPane.showInputDialog("Enter Scheduler Full Name:").trim();
-                String username = JOptionPane.showInputDialog("Enter Scheduler Username:").trim();
+                try {
+                    // Prompt for Scheduler Full Name
+                    String fullname = JOptionPane.showInputDialog("Enter Scheduler Full Name:").trim();
+                    if (fullname.isEmpty()) {
+                        throw new Exception("Full name cannot be empty!");
+                    }
 
-                if (DataIO.checkUserid(username) != null) {
-                    throw new Exception("Username is already taken!");
+                    // Prompt for Scheduler Username
+                    String username = JOptionPane.showInputDialog("Enter Scheduler Username:").trim();
+                    if (username.isEmpty()) {
+                        throw new Exception("Username cannot be empty!");
+                    }
+                    if (DataIO.checkUserid(username) != null) {
+                        throw new Exception("Username is already taken!");
+                    }
+
+                    // Prompt for Scheduler Password
+                    String password = JOptionPane.showInputDialog("Set Password for new scheduler:").trim();
+                    if (password.isEmpty()) {
+                        throw new Exception("Password cannot be empty!");
+                    }
+
+                    // Current date as the starting date
+                    String todayDate = java.time.LocalDate.now().toString();
+
+                    // Add new scheduler to the system
+                    DataIO.allUser.add(new User(fullname, username, password, "scheduler"));
+                    DataIO.allScheduler.add(new Scheduler(fullname, username, password, todayDate));
+                    DataIO.write(); // Save changes to files
+
+                    JOptionPane.showMessageDialog(a, "Scheduler successfully added");
+
+                    loadSchedulerData(); // Refresh table data
+                } catch (Exception ex) {
+                    // Display error message if any input is invalid or an exception occurs
+                    JOptionPane.showMessageDialog(a, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
-
-                String password = JOptionPane.showInputDialog("Set Password for new scheduler:").trim();
-                String todayDate = java.time.LocalDate.now().toString();
-
-                DataIO.allUser.add(new User(fullname, username, password, "scheduler"));
-                DataIO.allScheduler.add(new Scheduler(fullname, username, password, todayDate));
-                DataIO.write(); // Save changes to files
-                JOptionPane.showMessageDialog (a, "Scheduler succesfully added");
-
-                loadSchedulerData(); // Refresh table data
-
-            } else if (e.getSource() == edit) {
+            }
+            else if (e.getSource() == edit) {
                 // Edit selected scheduler information
                 int[] selectedRows = schedulerTable.getSelectedRows();
 

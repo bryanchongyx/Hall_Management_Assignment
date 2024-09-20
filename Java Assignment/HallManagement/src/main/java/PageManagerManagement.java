@@ -139,24 +139,46 @@ public class PageManagerManagement implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         try {
             if (e.getSource() == add) {
-                // Add new manager staff
-                String fullname = JOptionPane.showInputDialog("Enter Manager Full Name:").trim();
-                String username = JOptionPane.showInputDialog("Enter Manager Username:").trim();
-
-                if (DataIO.checkUserid(username) != null) {
-                    throw new Exception("Username is already taken!");
+                try {
+                    // Prompt for Manager Full Name
+                    String fullname = JOptionPane.showInputDialog("Enter Manager Full Name:").trim();
+                    if (fullname.isEmpty()) {
+                        throw new Exception("Full name cannot be empty!");
+                    }
+            
+                    // Prompt for Manager Username
+                    String username = JOptionPane.showInputDialog("Enter Manager Username:").trim();
+                    if (username.isEmpty()) {
+                        throw new Exception("Username cannot be empty!");
+                    }
+                    if (DataIO.checkUserid(username) != null) {
+                        throw new Exception("Username is already taken!");
+                    }
+            
+                    // Prompt for Manager Password
+                    String password = JOptionPane.showInputDialog("Set Password for new manager:").trim();
+                    if (password.isEmpty()) {
+                        throw new Exception("Password cannot be empty!");
+                    }
+            
+                    // Current date as the starting date
+                    String todayDate = java.time.LocalDate.now().toString();
+            
+                    // Add new manager to the system
+                    DataIO.allUser.add(new User(fullname, username, password, "manager"));
+                    DataIO.allManager.add(new Manager(fullname, username, password, todayDate));
+                    DataIO.write(); // Save changes to files
+            
+                    JOptionPane.showMessageDialog(a, "Manager successfully added");
+            
+                    loadManagerData(); // Refresh table data
+                } catch (Exception ex) {
+                    // Display error message if any input is invalid or an exception occurs
+                    JOptionPane.showMessageDialog(a, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
-
-                String password = JOptionPane.showInputDialog("Set Password for new manager:").trim();
-                String todayDate = java.time.LocalDate.now().toString();
-
-                DataIO.allUser.add(new User(fullname, username, password, "manager"));
-                DataIO.allManager.add(new Manager(fullname, username, password, todayDate));
-                DataIO.write(); // Save changes to files
-
-                loadManagerData(); // Refresh table data
-
-            } else if (e.getSource() == edit) {
+            }
+            
+            else if (e.getSource() == edit) {
                 // Get selected rows
                 int[] selectedRows = managerTable.getSelectedRows();
 
