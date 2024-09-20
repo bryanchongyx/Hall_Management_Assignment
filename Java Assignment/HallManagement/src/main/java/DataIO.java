@@ -24,6 +24,11 @@ public class DataIO {
     private static final String MANAGERS_FILE = "manager.txt";
     private static final String HALLS_FILE = "halls.txt";
     private static final String BOOKINGS_FILE = "bookings.txt";
+    //Manager txt file:
+    //Notification_Report.txt
+    //Sales_Report.txt
+    //Hall_Maintenance_Report.txt
+    //Scheduler_Manager_Chat.txt
     
 
     // Method to read all data from text files

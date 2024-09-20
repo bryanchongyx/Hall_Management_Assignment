@@ -134,6 +134,7 @@ public class PageSchedulerManagement implements ActionListener {
                 DataIO.allUser.add(new User(fullname, username, password, "scheduler"));
                 DataIO.allScheduler.add(new Scheduler(fullname, username, password, todayDate));
                 DataIO.write(); // Save changes to files
+                JOptionPane.showMessageDialog (a, "Scheduler succesfully added");
 
                 loadSchedulerData(); // Refresh table data
 
