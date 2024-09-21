@@ -1,0 +1,6 @@
+B1,Banquet Hall,300,100.0,Available
+B2,Banquet Hall,300,100.0,Available
+M1,Meeting Room,30,50.0,Available
+M2,Meeting Room,30,50.0,Available
+A1,Auditorium,1000,300.0,Available
+A2,Auditorium,1000,300.0,Available

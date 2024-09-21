@@ -2,7 +2,16 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -94,6 +103,13 @@ public class PageScheduler implements ActionListener {
         schedulerFrame.setVisible(true);
     }
 
+    // Add a method to set the hall status
+    private void setHallStatus(Hall hall, String status) {
+        hall.setStatus(status);
+        DataIO.write(); // Save changes to file
+        loadHallData(); // Refresh table data
+    }
+
     // Load hall data into the table
     private void loadHallData() {
         tableModel.setRowCount(0); // Clear existing data
@@ -102,6 +118,75 @@ public class PageScheduler implements ActionListener {
             tableModel.addRow(rowData);
         }
     }
+
+
+    private void updateAvailability(Hall hall, Date bookingDate, String bookingStartTime, String bookingEndTime) {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    String bookingDateString = dateFormat.format(bookingDate);
+
+    List<String> updatedAvailabilityLines = new ArrayList<>();
+
+    try {
+        // Read the current availability file
+        List<String> availabilityLines = Files.readAllLines(Paths.get("availability.txt"));
+
+        boolean updated = false;
+
+        for (String line : availabilityLines) {
+            String[] parts = line.split(",");
+            String hallName = parts[0];
+            String date = parts[1];
+            String availableFrom = parts[2];
+            String availableTill = parts[3];
+
+            // If the entry matches the hall and booking date, update availability
+            if (hallName.equals(hall.getHallName()) && date.equals(bookingDateString)) {
+                // Adjust the availability based on the booked times
+                String newAvailableFrom = availableFrom;
+                String newAvailableTill = availableTill;
+
+                if (bookingStartTime.compareTo(availableFrom) > 0) {
+                    // Booking doesn't overlap with start time
+                    newAvailableFrom = availableFrom;
+                } else if (bookingEndTime.compareTo(availableTill) < 0) {
+                    // Booking doesn't overlap with end time
+                    newAvailableTill = availableTill;
+                }
+
+                // If booking starts at the same time, adjust the start availability
+                if (bookingStartTime.equals(availableFrom)) {
+                    newAvailableFrom = bookingEndTime;
+                }
+
+                // If booking ends at the same time, adjust the end availability
+                if (bookingEndTime.equals(availableTill)) {
+                    newAvailableTill = bookingStartTime;
+                }
+
+                // Add updated availability line
+                updatedAvailabilityLines.add(hall.getHallName() + "," + bookingDateString + "," + newAvailableFrom + "," + newAvailableTill);
+                updated = true;
+            } else {
+                // Keep the line unchanged if it doesn't match the booking date or hall
+                updatedAvailabilityLines.add(line);
+            }
+        }
+
+        // If there was no existing entry for this hall on this date, add a new one
+        if (!updated) {
+            updatedAvailabilityLines.add(hall.getHallName() + "," + bookingDateString + ",08:00," + "18:00");
+        }
+
+        // Write the updated availability list back to the file
+        Files.write(Paths.get("availability.txt"), updatedAvailabilityLines);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Error updating availability file: " + e.getMessage());
+    }
+}
+
+
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -255,50 +340,66 @@ public class PageScheduler implements ActionListener {
                 }
 
             } else if (e.getSource() == setMaintenanceButton) {
-                // Set hall maintenance schedule
-                int selectedRow = hallTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    String hallName = (String) hallTable.getValueAt(selectedRow, 0);
-                    Hall hall = DataIO.findHallByName(hallName);
+    // Set hall maintenance schedule
+    int selectedRow = hallTable.getSelectedRow();
+    if (selectedRow != -1) {
+        String hallName = (String) hallTable.getValueAt(selectedRow, 0);
+        Hall hall = DataIO.findHallByName(hallName);
 
-                    if (hall != null) {
-                        String startDate = JOptionPane.showInputDialog("Enter start date for maintenance (YYYY-MM-DD):");
-                        if (startDate == null || startDate.trim().isEmpty()) {
-                            JOptionPane.showMessageDialog(schedulerFrame, "Start date cannot be empty.");
-                            return;
-                        }
+        if (hall != null) {
+            String startDate = JOptionPane.showInputDialog("Enter maintenance date (YYYY-MM-DD):");
+            if (startDate == null || startDate.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(schedulerFrame, "Date cannot be empty.");
+                return;
+            }
 
-                        String startTime = JOptionPane.showInputDialog("Enter start time for maintenance (HH:MM):");
-                        if (startTime == null || startTime.trim().isEmpty()) {
-                            JOptionPane.showMessageDialog(schedulerFrame, "Start time cannot be empty.");
-                            return;
-                        }
+            String startTime = JOptionPane.showInputDialog("Enter start time (HH:MM):");
+            if (startTime == null || startTime.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(schedulerFrame, "Start time cannot be empty.");
+                return;
+            }
 
-                        String endDate = JOptionPane.showInputDialog("Enter end date for maintenance (YYYY-MM-DD):");
-                        if (endDate == null || endDate.trim().isEmpty()) {
-                            JOptionPane.showMessageDialog(schedulerFrame, "End date cannot be empty.");
-                            return;
-                        }
+            String endTime = JOptionPane.showInputDialog("Enter end time (HH:MM):");
+            if (endTime == null || endTime.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(schedulerFrame, "End time cannot be empty.");
+                return;
+            }
 
-                        String endTime = JOptionPane.showInputDialog("Enter end time for maintenance (HH:MM):");
-                        if (endTime == null || endTime.trim().isEmpty()) {
-                            JOptionPane.showMessageDialog(schedulerFrame, "End time cannot be empty.");
-                            return;
-                        }
+            // Generate Maintenance Booking ID
+            String bookingID = "Main-" + (int) (Math.random() * 10000); // Simple random booking ID for maintenance
+            String schedulerUsername = Main.getLoggedInUser().getUserid(); // Assuming the scheduler is logged in and we can get their userID
 
-                        String remarks = JOptionPane.showInputDialog("Enter any remarks (optional):");
+            // Write to bookings.txt
+            try (PrintWriter writer = new PrintWriter(new FileOutputStream("bookings.txt", true))) {
+                writer.println(schedulerUsername + "," +
+                               hall.getHallName() + "," +
+                               bookingID + "," +
+                               startDate + "," +
+                               startTime + " - " + endTime + "," +
+                               "MAINTENANCE");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(schedulerFrame, "Error writing maintenance data.");
+            }
 
-                        hall.setMaintenance(startDate, startTime, endDate, endTime, remarks);
-                        DataIO.write(); // Save changes to file
-                        JOptionPane.showMessageDialog(schedulerFrame, "Hall maintenance schedule set successfully!");
-                    } else {
-                        JOptionPane.showMessageDialog(schedulerFrame, "Hall not found!");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(schedulerFrame, "Please select a hall to set maintenance.");
-                }
+            // Update availability for the hall on the selected date
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date maintenanceDate;
+            try {
+                maintenanceDate = dateFormat.parse(startDate);
+                updateAvailability(hall, maintenanceDate, startTime, endTime); // Update availability
+            } catch (ParseException ex) {
+                JOptionPane.showMessageDialog(schedulerFrame, "Invalid date format.");
+            }
 
-            } else if (e.getSource() == logoutButton) {
+            JOptionPane.showMessageDialog(schedulerFrame, "Maintenance schedule set successfully!");
+        } else {
+            JOptionPane.showMessageDialog(schedulerFrame, "Hall not found!");
+        }
+    } else {
+        JOptionPane.showMessageDialog(schedulerFrame, "Please select a hall to set maintenance.");
+    }
+}
+             else if (e.getSource() == logoutButton) {
                 schedulerFrame.setVisible(false);
                 Main.a1.a.setVisible(true);
             }
