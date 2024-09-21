@@ -1,0 +1,4 @@
+Karl Anthony,karlA,ant,2024-08-23
+Post Malone,posty,malone,2024-08-23
+Jeff Bezos,bezos,jeff,2024-08-23
+Steph Curry,curry,30,2024-08-23

@@ -133,10 +133,10 @@ public class PageLoginSignIn implements ActionListener {
     }
     
     @Override
-public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
         try {
             if (e.getSource() == login) {
-                String userid_input = userIdField.getText().trim();
+                String userid_input = JOptionPane.showInputDialog("Enter userid: ").trim();
                 User foundUser = DataIO.checkUserid(userid_input);
 
                 if (foundUser == null) {
@@ -150,6 +150,8 @@ public void actionPerformed(ActionEvent e) {
 
                 // Hide the login page
                 a.setVisible(false);
+                // When login is successful
+                Main.setLoggedInUser(foundUser);  // Set the logged-in user in the Main class
 
                 // Check user role
                 String role = foundUser.getRoles(); // Updated to get role from foundUser
@@ -161,17 +163,18 @@ public void actionPerformed(ActionEvent e) {
                     if (Main.a4 == null) {
                         Main.a4 = new PageSuperAdmin(user); // Instantiate if not already created
                     }
-                    a.setVisible(false);
                     Main.a4.a.setVisible(true);
 
                 } else if ("administrator".equals(role)) {
-                    Admin admin = DataIO.findAdminByUserId(userid_input);
-                    if (Main.a2 == null){
-                        Main.a2 = new PageAdmin (admin);
+                    Admin loggedAdmin = DataIO.findAdminByUserId(userid_input);
+                    if (loggedAdmin == null){
+                        throw new Exception ("Admin details not found");
                     }
-                    a.setVisible (false);
-                    Main.a2.a.setVisible (true);
-
+                    else if (Main.a2 == null){
+                        Main.a2 = new PageAdmin (loggedAdmin);
+                        a.setVisible(false);
+                        Main.a2.a.setVisible(true);
+                    }
                 } else if ("scheduler".equals(role)) {
                     if(Main.a9 == null){
                         Main.a9 = new PageScheduler();
@@ -202,12 +205,7 @@ public void actionPerformed(ActionEvent e) {
     }
 
     public void setVisible(boolean b) {
-        a.setVisible(true);
+        a.setVisible(b);
     }
-    public void clearFields(){
-        userIdField.setText ("");
-        passwordField.setText("");
-    }
-
 
 }

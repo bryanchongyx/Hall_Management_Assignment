@@ -11,3 +11,5 @@ Steph Curry,curry,30,manager
 Tom Aspinall,freddy,fred,scheduler
 Chandu Kolavennu,chandu,chandu,customer
 Chandu Kolavennu,ckolavennu,EL@w3dia19,scheduler
+Chandu,ck,123456,customer
+tester,test,test,customer

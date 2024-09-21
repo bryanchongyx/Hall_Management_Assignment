@@ -8,6 +8,8 @@ public class Hall {
     private String maintenanceStart;
     private String maintenanceEnd;
     private String remarks;
+    private String status; // New field for hall status
+
 
     public Hall(String hallName, String hallType, int capacity, double ratePerHour) {
         this.hallName = hallName;
@@ -19,6 +21,8 @@ public class Hall {
         this.maintenanceStart = "";
         this.maintenanceEnd = "";
         this.remarks = "";
+        this.status = "Available"; // Default status
+
     }
 
     // Getters and setters for all fields
@@ -92,6 +96,15 @@ public class Hall {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    // New getter and setter for status
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public void setAvailability(String startDate, String startTime, String endDate, String endTime, String remarks) {

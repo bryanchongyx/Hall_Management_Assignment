@@ -112,24 +112,52 @@ public class DataIO {
         }
     }
     
-        public static void addBooking(Booking booking) {
+    public static void addBooking(Booking booking, String bookingTime) {
         allBooking.add(booking);
-        writeBookings(); // Write booking data to file
+        writeBookings(booking, bookingTime); // Write booking data to file
     }
     
-        public static void writeBookings() {
-        try (PrintWriter writer = new PrintWriter("bookings.txt")) {
+    public static void writeBookings(Booking booking, String bookingTime) {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream("bookings.txt", true))) {
+            String bookingID = "B" + (allBooking.size() + 1); // Generate a simple booking ID
+    
+            // Format: Cus_Username, Room ID, Booking_ID, Booking Date, Booking Time Sessions, Payment Status
+            writer.println(booking.getUser().getUserid() + "," +
+                           booking.getHall().getHallName() + "," +
+                           bookingID + "," +
+                           booking.getBookingDate() + "," +
+                           bookingTime + "," +
+                           "PAID");  // Assuming payment is done for now
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing booking data.");
+        }
+    }
+    
+    public static void updateBookings() {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream("bookings.txt"))) {
             for (Booking booking : allBooking) {
+                String bookingID = "B" + (allBooking.indexOf(booking) + 1); // Reuse the booking ID logic
+                
+                // Assuming the booking time format is already set when the booking is created
+                String bookingTime = booking.getSessions().get(0).split(" - ")[0] + " - " +
+                                     booking.getSessions().get(booking.getSessions().size() - 1).split(" - ")[1];
+    
+                // Format: Cus_Username, Room ID, Booking_ID, Booking Date, Booking Time Sessions, Payment Status
                 writer.println(booking.getUser().getUserid() + "," +
                                booking.getHall().getHallName() + "," +
+                               bookingID + "," +
                                booking.getBookingDate() + "," +
-                               booking.isPaid() + "," +
-                               booking.isCancelled());
+                               bookingTime + "," +
+                               (booking.isPaid() ? "PAID" : "UNPAID"));  // Assuming payment status is stored
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error writing booking data.");
         }
     }
+    
+    
+
+
 
     // Admin-related methods
     private static void readAdmins() {
@@ -224,12 +252,14 @@ public class DataIO {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] hallData = line.split(",");
-                if (hallData.length == 4) {
+                if (hallData.length == 5) { // Updated length
                     String hallName = hallData[0].trim();
                     String hallType = hallData[1].trim();
                     int capacity = Integer.parseInt(hallData[2].trim());
                     double ratePerHour = Double.parseDouble(hallData[3].trim());
+                    String status = hallData[4].trim(); // New status field
                     Hall hall = new Hall(hallName, hallType, capacity, ratePerHour);
+                    hall.setStatus(status);
                     allHall.add(hall);
                 }
             }
@@ -241,13 +271,13 @@ public class DataIO {
     private static void writeHalls() {
         try (PrintWriter writer = new PrintWriter(new FileOutputStream(HALLS_FILE))) {
             for (Hall hall : allHall) {
-                writer.println(hall.getHallName() + "," + hall.getHallType() + "," + hall.getCapacity() + "," + hall.getRatePerHour());
+                writer.println(hall.getHallName() + "," + hall.getHallType() + "," + hall.getCapacity() + "," 
+                                + hall.getRatePerHour() + "," + hall.getStatus());
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error writing hall data.");
         }
     }
-
     // User lookup methods
     public static User checkUserid(String s) {
         for (User u : allUser) {
@@ -267,6 +297,16 @@ public class DataIO {
         }
         return null;
     }
+
+        // New method to store feedback
+    public static void addFeedback(String bookingID, String customerName, String roomID, String feedback) {
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream("feedback.txt", true))) {
+            writer.println(bookingID + "," + customerName + "," + roomID + "," + feedback);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error writing feedback data.");
+        }
+    }
+
 
     // Customer lookup methods
     public static Customer checkCustomerUserid(String s) {
