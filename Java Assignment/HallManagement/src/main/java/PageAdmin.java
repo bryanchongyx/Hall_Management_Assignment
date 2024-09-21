@@ -19,7 +19,7 @@ public class PageAdmin implements ActionListener {
 
     public PageAdmin(Admin admin) {
         this.admin = admin;
-        a = new JFrame("Admin Page");
+        a = new JFrame("Admin Dashboard");
         a.setSize(600, 400);
         a.setLocationRelativeTo(null); // Center the frame
         a.setLayout(new GridBagLayout());
