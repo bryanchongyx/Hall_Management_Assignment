@@ -24,6 +24,11 @@ public class DataIO {
     private static final String MANAGERS_FILE = "manager.txt";
     private static final String HALLS_FILE = "halls.txt";
     private static final String BOOKINGS_FILE = "bookings.txt";
+    //Manager txt file:
+    //Notification_Report.txt
+    //Sales_Report.txt
+    //Hall_Maintenance_Report.txt
+    //Scheduler_Manager_Chat.txt
     
 
     // Method to read all data from text files
@@ -530,15 +535,6 @@ public class DataIO {
         }
         updateUserPassword(userid, newPassword); // Update in users list
     }
-    // get logged Admin
-    public static Admin getLoggedAdmin() {
-        // Implement logic to retrieve the currently logged-in admin.
-        // This could be from a session, or simply the first admin in the list for testing purposes.
-        if (!allAdmin.isEmpty()) {
-            return allAdmin.get(0); // Assuming the first admin is the logged-in admin
-        }
-        return null;   
-        }
 
     // Method to find a hall by name
     public static Hall findHallByName(String hallName) {

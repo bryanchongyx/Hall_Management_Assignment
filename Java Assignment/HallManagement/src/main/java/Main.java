@@ -23,7 +23,6 @@ public class Main {
 
     public static void main(String[] args) {
         DataIO.read(); // Read all the data
-        Admin admin= DataIO.getLoggedAdmin();
         a1 = new PageLoginSignIn();
         // Assuming defaultUser gets set after successful login
         //DefaultUser = DataIO.checkUserid("someUserId"); // Example of getting the user

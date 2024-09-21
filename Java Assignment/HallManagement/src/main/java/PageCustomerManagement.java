@@ -1,19 +1,10 @@
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -32,8 +23,8 @@ public class PageCustomerManagement implements ActionListener {
 
         a = new JFrame();
         a.setTitle("Customer Management");
-        a.setSize(700, 350);
-        a.setLocation(500, 325);
+        a.setSize(700, 400);
+        a.setLocationRelativeTo(null); // Center the frame
         a.setLayout(new BorderLayout());
 
         // Buttons
@@ -46,40 +37,46 @@ public class PageCustomerManagement implements ActionListener {
         logoutButton.addActionListener(this);
         backButton.addActionListener(this);
 
-        a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         // Table Setup
         String[] columnNames = {"Full Name", "Username", "Email", "Phone Number", "Select"};
-        tableModel = new DefaultTableModel(columnNames, 0);
-        customerTable = new JTable(tableModel) {
+        tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public Class<?> getColumnClass(int column) {
                 return column == 4 ? Boolean.class : String.class;
             }
         };
+        customerTable = new JTable(tableModel);
         rowSorter = new TableRowSorter<>(tableModel);
         customerTable.setRowSorter(rowSorter);
         loadCustomerData();
 
         JScrollPane scrollPane = new JScrollPane(customerTable);
 
-        // Top panel for filter
-        JPanel filterPanel = new JPanel(new FlowLayout());
+        // Top panel for filter input
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         filterPanel.add(new JLabel("Search:"));
         filterPanel.add(filterField);
 
         // Bottom panel for buttons
-        JPanel bottomPanel = new JPanel(new FlowLayout());
-        bottomPanel.add(deleteButton);
-        bottomPanel.add(backButton);
-        bottomPanel.add(logoutButton);
+        JPanel bottomPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        bottomPanel.add(deleteButton, gbc);
+        gbc.gridx = 1;
+        bottomPanel.add(backButton, gbc);
+        gbc.gridx = 2;
+        bottomPanel.add(logoutButton, gbc);
 
+        // Add panels and scroll pane to the frame
         a.add(filterPanel, BorderLayout.NORTH);
         a.add(scrollPane, BorderLayout.CENTER);
         a.add(bottomPanel, BorderLayout.SOUTH);
         a.setVisible(true);
 
-        // Add KeyListener for the filterField
+        // Filter Field Setup
         filterField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -87,7 +84,19 @@ public class PageCustomerManagement implements ActionListener {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                    // Custom RowFilter to search across all columns
+                    rowSorter.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                        @Override
+                        public boolean include(RowFilter.Entry<? extends DefaultTableModel, ? extends Integer> entry) {
+                            for (int i = 0; i < entry.getValueCount(); i++) {
+                                // Check if any column contains the filter text
+                                if (entry.getStringValue(i).toLowerCase().contains(text.toLowerCase())) {
+                                    return true; // If found, include this row
+                                }
+                            }
+                            return false; // If not found, exclude this row
+                        }
+                    });
                 }
             }
         });
